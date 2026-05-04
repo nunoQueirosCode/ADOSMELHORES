@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using ADOSMELHORES.Data.Empresa;
+using Microsoft.EntityFrameworkCore;
 
 namespace ADOSMELHORES.Data
 {
@@ -9,6 +10,8 @@ namespace ADOSMELHORES.Data
         {
 
         }
+
+        public DbSet<Funcionario> Funcionarios { get; set; }
 
     }
 }
