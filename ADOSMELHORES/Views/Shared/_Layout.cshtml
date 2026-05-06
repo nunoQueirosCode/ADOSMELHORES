@@ -13,6 +13,8 @@
     
     <!-- FontAwesome para os ícones -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    @await RenderSectionAsync("Styles", required: false) <!-- Necessário para conseguir ter CSS dentro das VIEWS -->
 </head>
 <body>
 
