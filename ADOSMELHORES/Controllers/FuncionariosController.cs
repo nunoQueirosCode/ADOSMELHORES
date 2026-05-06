@@ -23,7 +23,7 @@ namespace ADOSMELHORES.Controllers
             return View(funcionarios);
         }
 
-        public async Task<IActionResult> Detalhes(int? id)
+        public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
             {
@@ -41,7 +41,7 @@ namespace ADOSMELHORES.Controllers
         }
 
         [HttpGet]
-        public IActionResult Registo()
+        public IActionResult Create()
         {
             var model = new FuncionarioViewModel();
 
@@ -58,7 +58,7 @@ namespace ADOSMELHORES.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Registo(FuncionarioViewModel model)
+        public async Task<IActionResult> Create(FuncionarioViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -110,7 +110,7 @@ namespace ADOSMELHORES.Controllers
 
                     _context.Add(novoFuncionario);
                     await _context.SaveChangesAsync();
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction(nameof(Details), new { id = novoFuncionario.Id });
                 }
             }
 
@@ -123,9 +123,21 @@ namespace ADOSMELHORES.Controllers
                 .ToList();
 
             return View(model);
-
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateRegistoCriminal(int id, DateTime novaDataRegisto)
+        {
+            var funcionario = await _context.Funcionarios.FindAsync(id);
+            if (funcionario == null) return NotFound();
 
+            funcionario.DataRegistoCriminal = novaDataRegisto;
+
+            _context.Update(funcionario);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Details), new {id = funcionario.Id}); 
+        }
     }
 }
