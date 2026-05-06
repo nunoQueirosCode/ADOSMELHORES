@@ -1,0 +1,124 @@
+﻿
+@{
+    ViewData["Title"] = "Gestão de Funcionários";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
+    <style>
+        .page-item.active .page-link {
+            background-color: var(--azul-conhecimento);
+            border-color: var(--azul-conhecimento);
+        }
+        div.dataTables_wrapper div.dataTables_filter input {
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+        }
+        div.dataTables_wrapper div.dataTables_filter input:focus {
+            border-color: var(--ciano-evolucao);
+            box-shadow: 0 0 0 0.25rem rgba(6, 182, 212, 0.25);
+            outline: 0;
+        }
+    </style>
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 style="color: var(--azul-conhecimento); font-weight: 700; margin-bottom: 0;">Funcionários</h2>
+        <span class="text-muted">Gere a equipa e formadores da empresa</span>
+    </div>
+    <a asp-action="Create" class="btn btn-ados">
+        <i class="fa-solid fa-user-plus me-2"></i>Novo Funcionário
+    </a>
+</div>
+
+<div class="card card-ados">
+    <div class="card-body p-4">
+        <div class="table-responsive">
+            <table id="tabelaFuncionarios" class="table table-hover align-middle" style="width:100%">
+                <thead style="border-bottom: 2px solid var(--ciano-evolucao); color: var(--azul-conhecimento);">
+                    <tr>
+                        <th>Nome</th>
+                        <th>Cargo</th>
+                        <th>Telefone</th>
+                        <th class="text-end">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                   
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="bg-light rounded-circle d-flex justify-content-center align-items-center me-3" style="width: 40px; height: 40px; color: var(--azul-conhecimento);">
+                                    <strong>JM</strong>
+                                </div>
+                                <div>
+                                    <div class="fw-bold text-dark">João Marques</div>
+                                    <div class="text-muted small">
+                                        <span class="badge bg-warning bg-opacity-10 text-warning border border-warning">Data de Contrato</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>Formador Sénior</td>
+                        <td>+351 912 345 678</td>
+                        <td class="text-end">
+                            <a asp-action="Details" asp-route-id="sadf" class="btn btn-sm btn-light text-info me-1" title="Detalhes">
+                                <i class="fa-solid fa-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="bg-light rounded-circle d-flex justify-content-center align-items-center me-3" style="width: 40px; height: 40px; color: var(--azul-conhecimento);">
+                                    <strong>JM</strong>
+                                </div>
+                                <div>
+                                    <div class="fw-bold text-dark">João Marques</div> 
+                                    <div class="text-muted small">
+                                        <span class="badge bg-danger bg-opacity-10 text-danger border border-danger">Registo Criminal</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>Formador Sénior</td>
+                        <td>+351 912 345 678</td>
+                        <td class="text-end">
+                            <a asp-action="Details" asp-route-id="asdfas" class="btn btn-sm btn-light text-info me-1" title="Detalhes">
+                                <i class="fa-solid fa-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('#tabelaFuncionarios').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/pt-PT.json',
+                },
+                dom: "<'row mb-3'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
+                     "<'row'<'col-sm-12'tr>>" +
+                     "<'row mt-3'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+                columnDefs: [
+                    { orderable: false, targets: 3 }
+                ],
+                order: [[0, 'asc']],
+                pageLength: 10,
+                lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Todos"]]
+            });
+        });
+    </script>
+}

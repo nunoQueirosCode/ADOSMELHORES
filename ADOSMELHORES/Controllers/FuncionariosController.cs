@@ -1,8 +1,10 @@
 ﻿using ADOSMELHORES.Data;
 using ADOSMELHORES.Data.Empresa;
+using ADOSMELHORES.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using static ADOSMELHORES.Data.Empresa.Formador;
 
 namespace ADOSMELHORES.Controllers
 {
@@ -77,7 +79,7 @@ namespace ADOSMELHORES.Controllers
                         novoFuncionario = new Secretaria
                         {
                             Salario = model.Salario,
-                            Area = model.AreaSecretaria,
+                            Area = model.Area,
                             DiretorId = model.DiretorId
                         };
                         break;
@@ -85,7 +87,7 @@ namespace ADOSMELHORES.Controllers
                         novoFuncionario = new Formador
                         {
                             AreaLecionada = model.AreaLecionada,
-                            Disponibilidade = (TipoDisponibilidade)model.Disponibilidade,
+                            TipoDisponibilidade = (Disponibilidade)model.TipoDisponibilidade,
                             ValorHora = model.ValorHora,
                             CoordenadorId = model.CoordenadorId
                         };
