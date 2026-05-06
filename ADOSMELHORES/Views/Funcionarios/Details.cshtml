@@ -1,0 +1,323 @@
+﻿
+@{
+    ViewData["Title"] = "Detalhes do Funcionário";
+    
+    // Simulação de lógica: O aviso aparece se faltarem menos de 30 dias para expirar
+    // (Na tua BD, garante que tens um campo tipo 'DataFimRegistoCriminal')
+    bool registoAExpirar = true; // Forçado a true para veres o design. Usa a tua lógica real aqui.
+    // Exemplo real: bool registoAExpirar = Model.DataFimRegistoCriminal <= DateTime.Now.AddDays(30);
+}
+
+<!-- Cabeçalho com Botão de Voltar -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 style="color: var(--azul-conhecimento); font-weight: 700; margin-bottom: 0;">Detalhes do Funcionário</h2>
+        <span class="text-muted">Informação completa e gestão de documentação</span>
+    </div>
+    <a asp-action="Index" class="btn btn-light border">
+        <i class="fa-solid fa-arrow-left me-2"></i>Voltar à Lista
+    </a>
+</div>
+
+<!-- SECÇÃO DE ALERTAS / AVISOS -->
+@if (registoAExpirar)
+{
+    <div class="alert alert-warning d-flex align-items-center shadow-sm mb-4" role="alert" style="border-left: 5px solid #ffc107;">
+        <i class="fa-solid fa-triangle-exclamation fs-3 me-3 text-warning"></i>
+        <div class="flex-grow-1">
+            <h5 class="alert-heading mb-1 fw-bold">Atenção: Registo Criminal a Expirar!</h5>
+            <p class="mb-0">O registo criminal deste funcionário expira em breve (ou já expirou). É necessário atualizar este documento legal para manter as funções ativas.</p>
+        </div>
+        <!-- Botão que abre o Modal -->
+        <button type="button" class="btn btn-warning fw-bold ms-3" data-bs-toggle="modal" data-bs-target="#modalRegistoCriminal">
+            <i class="fa-solid fa-calendar-check me-2"></i>Atualizar Data
+        </button>
+    </div>
+}
+
+<!-- DETALHES DO FUNCIONÁRIO (Layout em 2 Colunas) -->
+<div class="row">
+    <!-- Coluna Esquerda: Info Principal -->
+    <div class="col-md-4 mb-4">
+        <div class="card card-ados h-100">
+            <div class="card-body text-center p-4">
+                <div class="bg-light rounded-circle d-flex justify-content-center align-items-center mx-auto mb-3" style="width: 100px; height: 100px; color: var(--azul-conhecimento); font-size: 2rem;">
+                    <!-- Podes pôr as iniciais dinâmicas aqui ou a foto de perfil -->
+                    <strong>JM</strong>
+                </div>
+                <h4 class="fw-bold" style="color: var(--azul-conhecimento);">João Marques</h4>
+                <p class="text-muted mb-1">Formador Sénior</p>
+                <span class="badge bg-success bg-opacity-10 text-success border border-success mb-3">Estado: Ativo</span>
+                
+                <hr />
+                
+                <div class="text-start mt-4">
+                    <p class="mb-2"><i class="fa-solid fa-phone me-2" style="color: var(--ciano-evolucao);"></i> <strong>Telefone:</strong><br /> +351 912 345 678</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Coluna Direita: Mais Detalhes e Ações -->
+    <div class="col-md-8 mb-4">
+        <div class="card card-ados h-100">
+            <div class="card-header card-ados-header d-flex justify-content-between align-items-center">
+                <span><i class="fa-solid fa-circle-info me-2"></i>Informação Detalhada</span>
+                <!-- Botões de Ação Principais -->
+                <div>
+                    <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-ados btn-sm me-2">
+                        <i class="fa-solid fa-pen"></i> Editar
+                    </a>
+                    <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modalDelete">
+                        <i class="fa-solid fa-trash"></i> Eliminar
+                    </button>
+                </div>
+            </div>
+            <div class="card-body p-4">
+                <div class="row">
+                    <div class="col-sm-6 mb-3">
+                        <span class="text-muted small text-uppercase fw-bold">Validade de Contrato</span>
+                        <p class="mb-0 text-dark">01 de Setembro de 2021</p>
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <span class="text-muted small text-uppercase fw-bold">Validade Registo Criminal</span>
+                        <!-- Destacar a data se estiver a expirar -->
+                        <p class="mb-0 @(registoAExpirar ? "text-danger fw-bold" : "text-dark")">
+                            31 de Outubro de 2023
+                            @if (registoAExpirar)
+                            {
+                                <i class="fa-solid fa-circle-exclamation ms-1"></i>
+                            }
+                        </p>
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <span class="text-muted small text-uppercase fw-bold">Morada Completa</span>
+                        <p class="mb-0 text-dark">Rua da Formação, Lote 4, 3º Esq, 4800-000 Guimarães</p>
+                    </div>
+                    
+                </div>
+                
+                <!--DADOS DIRETOR-->
+                <hr />
+                <div class="row">
+                    
+                    <div class="col-sm-6 mb-3">
+                        <span class="text-muted small text-uppercase fw-bold">Salário Base</span>
+                        <p class="mb-0 text-dark">€1 000 </p>
+                    </div>
+
+                    <div class="col-sm-6 mb-3">
+                        <span class="text-muted small text-uppercase fw-bold">Bónus Base</span>
+                        <p class="mb-0 text-dark">€500 </p>
+                    </div>
+
+                    <div class="col-sm-6 mb-3">
+                        <span class="text-muted small text-uppercase fw-bold">Isenção de Horário</span>
+                        <p class="mb-0 text-dark">Sim </p>
+                    </div>
+
+                    <div class="col-sm-6 mb-3">
+                        <span class="text-muted small text-uppercase fw-bold">Viatura da Empresa</span>
+                        <p class="mb-0 text-dark">Sim </p>
+                    </div>
+                </div>
+                
+                <!--DADOS SECRETARIA-->
+                <hr />
+                <div class="row">
+                    
+                    <div class="col-sm-6 mb-3">
+                        <span class="text-muted small text-uppercase fw-bold">Salário Base</span>
+                        <p class="mb-0 text-dark">€1 000 </p>
+                    </div>
+
+                    <div class="col-sm-6 mb-3">
+                        <span class="text-muted small text-uppercase fw-bold">Departamento</span>
+                        <p class="mb-0 text-dark">Contabilidade </p>
+                    </div>
+
+                    <div class="col-sm-6 mb-3">
+                        <span class="text-muted small text-uppercase fw-bold">Superior</span>
+                        <p class="mb-0 text-dark">Nome do Diretor</p>
+                    </div>
+
+                </div>
+
+                <!--DADOS FORMADOR-->
+                <hr />
+                <div class="row">
+                    
+                    <div class="col-sm-6 mb-3">
+                        <span class="text-muted small text-uppercase fw-bold">Valor Hora</span>
+                        <p class="mb-0 text-dark">€50 </p>
+                    </div>
+
+                    <div class="col-sm-6 mb-3">
+                        <span class="text-muted small text-uppercase fw-bold">Coordenador</span>
+                        <p class="mb-0 text-dark">Programação de Sistemas </p>
+                    </div>
+
+                    <div class="col-sm-6 mb-3">
+                        <span class="text-muted small text-uppercase fw-bold">Área de Ensino</span>
+                        <p class="mb-0 text-dark">Programação de Sistemas </p>
+                    </div>
+
+                    <div class="col-sm-6 mb-3">
+                        <span class="text-muted small text-uppercase fw-bold">Disponibilidade</span>
+                        <p class="mb-0 text-dark">Pós-Laboral</p>
+                    </div>
+
+                </div>
+
+                <!--DADOS COORDENADOR-->
+                <hr />
+                <div class="row">
+                    
+                    <div class="col-sm-6 mb-3">
+                        <span class="text-muted small text-uppercase fw-bold">Salário Base</span>
+                        <p class="mb-0 text-dark">€50 </p>
+                    </div>
+                    @*
+                    @if (Model.FormadoresAssociados != null && Model.FormadoresAssociados.Any())
+                    {
+                    *@
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light" style="color: var(--azul-conhecimento);">
+                                    <tr>
+                                        <th class="ps-4">Nome do Formador</th>
+                                        <th>Área de Lecionação</th>
+                                        <th>Disponibilidade</th>
+                                        <th>Valor/Hora</th>
+                                        <th class="text-end pe-4">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @*
+                                    @foreach (var formador in Model.FormadoresAssociados)
+                                    {
+                                    *@
+                                        <tr>
+                                            <td class="ps-4">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="bg-light rounded-circle d-flex justify-content-center align-items-center me-3" style="width: 32px; height: 32px; font-size: 0.8rem; color: var(--ciano-evolucao);">
+                                                        <i class="fa-solid fa-chalkboard-user"></i>
+                                                    </div>
+                                                    <div>
+                                                        <div class="fw-bold text-dark">@*formador.Nome*@</div>
+                                                        <div class="text-muted small">ID: @*formador.Id*@</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td><span class="badge bg-primary bg-opacity-10 text-primary border border-primary">@*formador.AreaLeciona*@</span></td>
+                                            <td>
+                                                @*
+                                                @if (formador.Disponibilidade == "Laboral")
+                                                {
+                                                *@
+                                                    Laboral
+                                                @*}
+                                                else if (formador.Disponibilidade == "Pós-Laboral")
+                                                { *@
+                                                    
+                                                    Pós-Laboral
+                                                @*}
+                                                else
+                                                {*@
+                                                    Ambas
+                                                @*} *@
+                                            </td>
+                                            <td>50€ @*@formador.ValorHora.ToString("C")*@</td>
+                                            <td class="text-end pe-4">
+                                                <a asp-controller="Funcionarios" asp-action="Details" asp-route-id="@*@formador.Id*@" class="btn btn-sm btn-light text-info" title="Ver Formador">
+                                                    <i class="fa-solid fa-eye"></i>
+                                                </a>
+                                                <button class="btn btn-sm btn-light text-danger" title="Remover da Equipa">
+                                                    <i class="fa-solid fa-link-slash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    @*}*@
+                                </tbody>
+                            </table>
+                        </div>
+                    @*}
+                    else
+                    {*@
+                        <div class="text-center py-5">
+                            <i class="fa-solid fa-folder-open text-muted mb-3" style="font-size: 3rem; opacity: 0.5;"></i>
+                            <h5 class="text-muted">Sem formadores associados</h5>
+                            <p class="text-muted small mb-0">Este coordenador ainda não tem nenhuma equipa de formadores atribuída.</p>
+                        </div>
+                    @*}*@
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+<!-- ========================================== -->
+<!-- MODALS (Ficam escondidos até serem chamados) -->
+<!-- ========================================== -->
+<!-- Modal para Atualizar Data do Registo Criminal -->
+<div class="modal fade" id="modalRegistoCriminal" tabindex="-1" aria-labelledby="modalRegistoCriminalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            
+            <!-- O formulário vai enviar a nova data para uma ação no teu Controller -->
+            <form asp-action="UpdateRegistoCriminal" method="post">
+                <!-- Input escondido com o ID do funcionário -->
+                <input type="hidden" name="id" value="@Model?.Id" />
+
+                <div class="modal-header bg-warning border-0">
+                    <h5 class="modal-title fw-bold text-dark" id="modalRegistoCriminalLabel">
+                        <i class="fa-solid fa-calendar-check me-2"></i>Renovar Registo Criminal
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <p class="text-muted mb-3">Insira a nova data de validade do documento entregue pelo funcionário.</p>
+                    <div class="mb-3">
+                        <label for="NovaDataRegisto" class="form-label fw-bold">Nova Data de Validade:</label>
+                        <!-- O DatePicker nativo do HTML5 (funciona perfeitamente e é gerido pelo Bootstrap) -->
+                        <input type="date" class="form-control form-control-lg" id="NovaDataRegisto" name="novaDataValidade" required>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-warning fw-bold">Guardar Nova Data</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmação de Eliminação (Segurança Extra) -->
+<div class="modal fade" id="modalDelete" tabindex="-1" aria-labelledby="modalDeleteLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-danger text-white border-0">
+                <h5 class="modal-title fw-bold" id="modalDeleteLabel">
+                    <i class="fa-solid fa-triangle-exclamation me-2"></i>Confirmar Eliminação
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4 text-center">
+                <i class="fa-solid fa-trash text-danger mb-3" style="font-size: 3rem;"></i>
+                <h4>Tens a certeza?</h4>
+                <p class="text-muted">Estás prestes a eliminar este funcionário permanentemente. Esta ação não pode ser desfeita.</p>
+            </div>
+            <div class="modal-footer border-0 bg-light justify-content-center">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form asp-action="DeleteConfirmed" method="post">
+                    <input type="hidden" name="id" value="@Model?.Id" />
+                    <button type="submit" class="btn btn-danger">Sim, Eliminar Funcionário</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
