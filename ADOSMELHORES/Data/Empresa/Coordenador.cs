@@ -2,8 +2,8 @@
 {
     public class Coordenador : Funcionario
     {
-        public int Salario { get; set; }
+        public decimal Salario { get; set; }
 
-        public List <Formador> FormadoresAlocados { get; set; } = new List<Formador>();
+        public ICollection<Formador> FormadoresAlocados { get; set; } = new List<Formador>();
     }
 }
