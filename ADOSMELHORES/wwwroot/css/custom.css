@@ -1,0 +1,150 @@
+﻿/* =========================================
+   ADOSMELHORES - Brand Identity & Layout
+   ========================================= */
+
+:root {
+    --azul-conhecimento: #1A365D;
+    --dourado-excelencia: #F59E0B;
+    --ciano-evolucao: #06B6D4;
+    --branco-neve: #F8FAFC;
+    --cinza-ardosia: #334155;
+}
+
+body {
+    background-color: var(--branco-neve);
+    color: var(--cinza-ardosia);
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    overflow-x: hidden;
+}
+
+/* --- ESTRUTURA DO LAYOUT --- */
+.wrapper {
+    display: flex;
+    width: 100%;
+    align-items: stretch;
+    min-height: 100vh;
+}
+
+/* --- MENU LATERAL (SIDEBAR) --- */
+.sidebar {
+    min-width: 260px;
+    max-width: 260px;
+    background-color: var(--azul-conhecimento);
+    color: #fff;
+    transition: all 0.3s ease;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    z-index: 100;
+}
+
+.sidebar-header {
+    padding: 20px;
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.sidebar-brand {
+    color: var(--branco-neve);
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-decoration: none;
+    letter-spacing: 1px;
+}
+
+    .sidebar-brand span {
+        color: var(--dourado-excelencia);
+    }
+
+    .sidebar-brand:hover {
+        color: var(--branco-neve);
+    }
+
+.sidebar-menu {
+    padding: 15px 0;
+    list-style: none;
+    margin: 0;
+}
+
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    padding: 12px 25px;
+    color: #cbd5e1;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    border-left: 4px solid transparent;
+}
+
+    .sidebar-link i {
+        min-width: 30px;
+        font-size: 1.1rem;
+    }
+
+    .sidebar-link:hover,
+    .sidebar-link.active {
+        background-color: rgba(255, 255, 255, 0.05);
+        color: var(--ciano-evolucao);
+        border-left-color: var(--dourado-excelencia);
+    }
+
+/* --- PAINEL PRINCIPAL --- */
+.main-panel {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.top-header {
+    background-color: #fff;
+    padding: 15px 30px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.content-area {
+    padding: 30px;
+    flex-grow: 1;
+}
+
+/* --- BOTÕES PERSONALIZADOS --- */
+.btn-ados {
+    background-color: var(--dourado-excelencia);
+    color: #fff;
+    border: none;
+    font-weight: 600;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+    .btn-ados:hover {
+        background-color: #d97706;
+        color: #fff;
+        transform: translateY(-1px);
+    }
+
+/* --- CARTÕES (CARDS) --- */
+.card-ados {
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    transition: box-shadow 0.3s ease;
+    background: #fff;
+    margin-bottom: 20px;
+}
+
+    .card-ados:hover {
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+
+.card-ados-header {
+    background-color: transparent;
+    border-bottom: 2px solid var(--ciano-evolucao);
+    font-weight: 600;
+    color: var(--azul-conhecimento);
+    padding: 15px 20px;
+}
