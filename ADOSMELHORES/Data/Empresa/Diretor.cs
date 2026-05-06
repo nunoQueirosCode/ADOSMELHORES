@@ -6,9 +6,7 @@ namespace ADOSMELHORES.Data.Empresa
     {
         public bool IsencaoHorario { get; set; }
 
-        [DataType(DataType.Currency)]
-
-        public decimal salario { get; set; }
+        public decimal Salario { get; set; }
 
         public decimal BonusMensal { get; set; }
 
