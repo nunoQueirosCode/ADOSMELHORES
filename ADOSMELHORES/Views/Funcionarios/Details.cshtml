@@ -64,7 +64,13 @@
                 <span><i class="fa-solid fa-circle-info me-2"></i>Informação Detalhada</span>
                 <!-- Botões de Ação Principais -->
                 <div>
-                    <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-ados btn-sm me-2">
+                    @*@if (Model.TipoFuncionario == "Formador")
+                    {*@
+                        <button type="button" class="btn btn-success btn-sm me-2" data-bs-toggle="modal" data-bs-target="#modalCalcularVencimento">
+                            <i class="fa-solid fa-calculator"></i> Calcular Vencimento
+                        </button>
+                    @*}*@
+                    <a asp-action="Edit" asp-route-id="@*Model?.Id*@" class="btn btn-ados btn-sm me-2">
                         <i class="fa-solid fa-pen"></i> Editar
                     </a>
                     <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modalDelete">
@@ -225,6 +231,14 @@
                                                 <a asp-controller="Funcionarios" asp-action="Details" asp-route-id="@*@formador.Id*@" class="btn btn-sm btn-light text-info" title="Ver Formador">
                                                     <i class="fa-solid fa-eye"></i>
                                                 </a>
+                                                <button class="btn btn-sm btn-light text-danger"
+                                                        title="Remover da Equipa"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#modalRemoverFormador"
+                                                        data-id="@*formador.Id*@"
+                                                        data-nome="@*formador.Nome*@">
+                                                    <i class="fa-solid fa-link-slash"></i>
+                                                </button>
                                             </td>
                                         </tr>
                                     @*}*@
@@ -235,9 +249,9 @@
                     else
                     {*@
                         <div class="text-center py-5">
-                            <i class="fa-solid fa-folder-open text-muted mb-3" style="font-size: 3rem; opacity: 0.5;"></i>
+                            <i class="fa-solid fa-user-slash text-muted mb-2" style="font-size: 2rem; opacity: 0.3;"></i>
                             <h5 class="text-muted">Sem formadores associados</h5>
-                            <p class="text-muted small mb-0">Este coordenador ainda não tem nenhuma equipa de formadores atribuída.</p>
+                            <p class="text-muted small mb-0">Este coordenador ainda não tem nenhum formador atribuído.</p>
                         </div>
                     @*}*@
 
@@ -249,9 +263,7 @@
 
 </div>
 
-<!-- ========================================== -->
-<!-- MODALS (Ficam escondidos até serem chamados) -->
-<!-- ========================================== -->
+
 <!-- Modal para Atualizar Data do Registo Criminal -->
 <div class="modal fade" id="modalRegistoCriminal" tabindex="-1" aria-labelledby="modalRegistoCriminalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -260,7 +272,7 @@
             <!-- O formulário vai enviar a nova data para uma ação no teu Controller -->
             <form asp-action="UpdateRegistoCriminal" method="post">
                 <!-- Input escondido com o ID do funcionário -->
-                <input type="hidden" name="id" value="@Model?.Id" />
+                <input type="hidden" name="id" value="@*Model?.Id*@" />
 
                 <div class="modal-header bg-warning border-0">
                     <h5 class="modal-title fw-bold text-dark" id="modalRegistoCriminalLabel">
@@ -304,10 +316,240 @@
             <div class="modal-footer border-0 bg-light justify-content-center">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                 <form asp-action="DeleteConfirmed" method="post">
-                    <input type="hidden" name="id" value="@Model?.Id" />
+                    <input type="hidden" name="id" value="@*Model?.Id*@" />
                     <button type="submit" class="btn btn-danger">Sim, Eliminar Funcionário</button>
                 </form>
             </div>
         </div>
     </div>
 </div>
+
+@*@if (Model.TipoFuncionario == "Coordenador")
+ {*@
+<!--Modal para confrimar remoção de formador da equipa-->
+<div class="modal fade" id="modalRemoverFormador" tabindex="-1" aria-labelledby="modalRemoverLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-danger text-white border-0">
+                <h5 class="modal-title fw-bold" id="modalRemoverLabel">
+                    <i class="fa-solid fa-link-slash me-2"></i>Remover Formador
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            <form id="formRemoverFormador">
+                <input type="hidden" name="formadorId" id="formadorIdModal" value="" />
+                <input type="hidden" name="coordenadorId" id="coordenadorIdModal" value="@*Model.Id*@" />
+
+                <div class="modal-body p-4 text-center">
+                    <i class="fa-solid fa-user-minus text-danger mb-3" style="font-size: 3rem;"></i>
+                    <h4>Tens a certeza?</h4>
+                    <p class="text-muted mb-0">Estás prestes a remover o formador <strong id="nomeFormadorModal" class="text-dark"></strong> da equipa deste coordenador.</p>
+                </div>
+                
+                <div class="modal-footer border-0 bg-light justify-content-center">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">Sim, Remover Formador</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@*}*@
+
+
+@*@if (Model.TipoFuncionario == "Formador")
+ {*@
+<!--Modal para calculo de vencimento do Formador-->
+<div class="modal fade" id="modalCalcularVencimento" tabindex="-1" aria-labelledby="modalCalcLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-success text-white border-0">
+                <h5 class="modal-title fw-bold" id="modalCalcLabel">
+                    <i class="fa-solid fa-calculator me-2"></i>Calcular Vencimento
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                
+                <form id="formCalcularVencimento">
+                    <input type="hidden" id="calcFormadorId" value="@*Model.Id*@" />
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-muted text-uppercase">Data Início</label>
+                            <input type="date" class="form-control" id="calcDataInicio" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-muted text-uppercase">Data Fim</label>
+                            <input type="date" class="form-control" id="calcDataFim" required>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 text-center">
+                        <button type="submit" class="btn btn-success w-100 fw-bold" id="btnCalcular">
+                            Calcular Total a Pagar
+                        </button>
+                    </div>
+                </form>
+
+                <div id="resultadoCalculo" class="mt-4 d-none">
+                    <div class="alert alert-success mb-0 text-center border-success" style="background-color: #f0fdf4;">
+                        <h6 class="mb-1 text-success text-uppercase small fw-bold">Valor a Pagar:</h6>
+                        <h2 class="fw-bold mb-1 text-success" id="valorFinalDisplay">0,00 €</h2>
+                        <span class="badge bg-success bg-opacity-25 text-success" id="detalhesCalculoDisplay">
+                            0 dias x 6h x 0€/h
+                        </span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+@*}*@
+
+@section Scripts {
+@*@if (Model.TipoFuncionario == "Coordenador")
+ {*@
+
+    <script>
+        $(document).ready(function () {
+            
+            // Variável para guardar a linha (tr) que vai ser apagada
+            var linhaParaRemover = null;
+
+            // 1. Quando o modal abre, preenchemos os dados E guardamos a linha
+            $('#modalRemoverFormador').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget);
+                
+                var formadorId = button.data('id');
+                var formadorNome = button.data('nome');
+                
+                var modal = $(this);
+                modal.find('#formadorIdModal').val(formadorId);
+                modal.find('#nomeFormadorModal').text(formadorNome);
+
+                // O segredo está aqui: procurar o 'tr' (table row) mais próximo do botão que foi clicado
+                linhaParaRemover = button.closest('tr');
+            });
+
+            // 2. Quando o utilizador clica em "Sim, Remover" no form do modal
+            $('#formRemoverFormador').submit(function (e) {
+                e.preventDefault(); // Impede o refresh da página
+
+                var formadorId = $('#formadorIdModal').val();
+                var coordenadorId = $('#coordenadorIdModal').val();
+                
+                // Mudar o texto do botão para mostrar que está a processar
+                var btnSubmit = $(this).find('button[type="submit"]');
+                var textoOriginal = btnSubmit.html();
+                btnSubmit.html('<i class="fa-solid fa-spinner fa-spin me-2"></i>A remover...').prop('disabled', true);
+
+                // 3. Fazer o pedido AJAX
+                $.ajax({
+                    url: '/FuncionariosController/RemoverAssociacaoAPI', // Caminho para o teu método no Controller
+                    type: 'POST',
+                    data: {
+                        formadorId: formadorId,
+                        coordenadorId: coordenadorId
+                    },
+                    success: function (response) {
+                        if (response.sucesso) {
+                            // Sucesso! Fechar o modal
+                            $('#modalRemoverFormador').modal('hide');
+
+                            // Fazer a animação de desaparecer na linha da tabela
+                            if (linhaParaRemover) {
+                                linhaParaRemover.css('background-color', '#fee2e2'); // Fica vermelho claro por 1 seg
+                                linhaParaRemover.fadeOut(600, function () {
+                                    $(this).remove(); // Remove mesmo o HTML depois de desaparecer
+                                    
+                                    // Bónus: Se quiseres atualizar o contador de formadores no topo
+                                    var badgeCount = $('.badge.bg-secondary');
+                                    var totalAtuais = parseInt(badgeCount.text()) - 1;
+                                    badgeCount.text(totalAtuais);
+                                });
+                            }
+                        } else {
+                            // Se o servidor devolver erro (ex: formador não existe)
+                            alert('Erro: ' + response.mensagem);
+                        }
+                    },
+                    error: function () {
+                        alert('Ocorreu um erro ao tentar comunicar com o servidor.');
+                    },
+                    complete: function () {
+                        // Restaura o botão ao estado original
+                        btnSubmit.html(textoOriginal).prop('disabled', false);
+                    }
+                });
+            });
+
+        });
+    </script>
+
+@*}*@
+
+
+@*@if (Model.TipoFuncionario == "Formador")
+ {*@
+
+    <script>
+        $(document).ready(function () {
+            
+            $('#formCalcularVencimento').submit(function (e) {
+                e.preventDefault(); // Impede que a página faça refresh
+
+                // 1. Obter os valores do modal
+                var idFormador = $('#calcFormadorId').val();
+                var dataInicio = $('#calcDataInicio').val();
+                var dataFim = $('#calcDataFim').val();
+
+                // 2. Colocar o botão em estado de "A carregar..." para dar feedback ao utilizador
+                var btn = $('#btnCalcular');
+                var textoOriginal = btn.html();
+                btn.html('<i class="fa-solid fa-spinner fa-spin me-2"></i>A calcular...').prop('disabled', true);
+
+                // 3. Fazer o pedido AJAX ao Controlador
+                $.ajax({
+                    url: '/Funcionarios/CalcularVencimentoAPI', // O nome do teu método no C#
+                    type: 'POST',
+                    data: {
+                        id: idFormador,
+                        dataInicio: dataInicio,
+                        dataFim: dataFim
+                    },
+                    success: function (response) {
+                        if (response.sucesso) {
+                            // Se correu bem, injetamos os dados no HTML e mostramos a div
+                            $('#valorFinalDisplay').text(response.valorTotalFormatado);
+                            $('#detalhesCalculoDisplay').text(response.detalhesCalculo);
+                            
+                            // Animação suave para mostrar o resultado
+                            $('#resultadoCalculo').removeClass('d-none').hide().fadeIn();
+                        } else {
+                            alert('Atenção: ' + response.mensagem);
+                        }
+                    },
+                    error: function () {
+                        alert('Ocorreu um erro de comunicação com o servidor.');
+                    },
+                    complete: function() {
+                        // Independentemente de dar erro ou sucesso, restauramos o botão ao normal
+                        btn.html(textoOriginal).prop('disabled', false);
+                    }
+                });
+            });
+
+            // Truque de UI: Limpar o modal sempre que ele é fechado, para estar limpo na próxima vez
+            $('#modalCalcularVencimento').on('hidden.bs.modal', function () {
+                $('#resultadoCalculo').addClass('d-none');
+                $('#formCalcularVencimento')[0].reset();
+            });
+
+        });
+    </script>
+
+@*}*@
+}
