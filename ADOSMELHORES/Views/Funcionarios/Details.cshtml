@@ -47,7 +47,6 @@
                 </div>
                 <h4 class="fw-bold" style="color: var(--azul-conhecimento);">João Marques</h4>
                 <p class="text-muted mb-1">Formador Sénior</p>
-                <span class="badge bg-success bg-opacity-10 text-success border border-success mb-3">Estado: Ativo</span>
                 
                 <hr />
                 
@@ -186,7 +185,7 @@
                                 <thead class="table-light" style="color: var(--azul-conhecimento);">
                                     <tr>
                                         <th class="ps-4">Nome do Formador</th>
-                                        <th>Área de Lecionação</th>
+                                        <th>Área de Ensino</th>
                                         <th>Disponibilidade</th>
                                         <th>Valor/Hora</th>
                                         <th class="text-end pe-4">Ações</th>
@@ -200,16 +199,10 @@
                                         <tr>
                                             <td class="ps-4">
                                                 <div class="d-flex align-items-center">
-                                                    <div class="bg-light rounded-circle d-flex justify-content-center align-items-center me-3" style="width: 32px; height: 32px; font-size: 0.8rem; color: var(--ciano-evolucao);">
-                                                        <i class="fa-solid fa-chalkboard-user"></i>
-                                                    </div>
-                                                    <div>
-                                                        <div class="fw-bold text-dark">@*formador.Nome*@</div>
-                                                        <div class="text-muted small">ID: @*formador.Id*@</div>
-                                                    </div>
+                                                    <div class="fw-bold text-dark">Formador 1@*formador.Nome*@</div>
                                                 </div>
                                             </td>
-                                            <td><span class="badge bg-primary bg-opacity-10 text-primary border border-primary">@*formador.AreaLeciona*@</span></td>
+                                            <td>Programação de Sistemas@*formador.AreaLeciona*@</td>
                                             <td>
                                                 @*
                                                 @if (formador.Disponibilidade == "Laboral")
@@ -232,9 +225,6 @@
                                                 <a asp-controller="Funcionarios" asp-action="Details" asp-route-id="@*@formador.Id*@" class="btn btn-sm btn-light text-info" title="Ver Formador">
                                                     <i class="fa-solid fa-eye"></i>
                                                 </a>
-                                                <button class="btn btn-sm btn-light text-danger" title="Remover da Equipa">
-                                                    <i class="fa-solid fa-link-slash"></i>
-                                                </button>
                                             </td>
                                         </tr>
                                     @*}*@
