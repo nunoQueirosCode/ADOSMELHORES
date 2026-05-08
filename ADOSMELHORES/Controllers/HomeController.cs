@@ -6,16 +6,25 @@ namespace ADOSMELHORES.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
-
-        public HomeController(ILogger<HomeController> logger)
-        {
-            _logger = logger;
-        }
+        public static DateTime DataSimulada = DateTime.Now;
 
         public IActionResult Index()
         {
-            return View();
+            return View(DataSimulada);
+        }
+
+        [HttpPost]
+        public IActionResult AlterarData(DateTime novaData)
+        {
+            DataSimulada = novaData;
+            return Json(DataSimulada);
+        }
+
+        [HttpPost]
+        public IActionResult ResetarData()
+        {
+            DataSimulada = DateTime.Now;
+            return Json(DataSimulada);
         }
 
         public IActionResult Privacy()
