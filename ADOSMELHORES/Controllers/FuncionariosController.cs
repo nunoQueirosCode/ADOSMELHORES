@@ -139,5 +139,147 @@ namespace ADOSMELHORES.Controllers
 
             return RedirectToAction(nameof(Details), new {id = funcionario.Id}); 
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var funcionario = await _context.Funcionarios.FindAsync(id);
+            if (funcionario == null) return NotFound();
+
+            var model = new FuncionarioViewModel
+            {
+                Id = funcionario.Id,
+                Nome = funcionario.Nome,
+                Morada = funcionario.Morada,
+                Contacto = funcionario.Contacto,
+                DataFimContrato = funcionario.DataFimContrato,
+                DataRegistoCriminal = funcionario.DataRegistoCriminal,
+                ListaDiretores = _context.Diretores.Select(d => new SelectListItem { Value = d.Id.ToString(), Text = d.Nome }).ToList(),
+                ListaCoordenadores = _context.Coordenadores.Select(c => new SelectListItem { Value = c.Id.ToString(), Text = c.Nome }).ToList()
+            };
+
+            if (funcionario is Diretor diretor)
+            {
+                model.TipoFuncionario = "Diretor";
+                model.IsencaoHorario = diretor.IsencaoHorario;
+                model.BonusMensal = diretor.BonusMensal;
+                model.CarroEmpresa = diretor.CarroEmpresa;
+                model.Salario = diretor.Salario;
+            }
+            else if (funcionario is Secretaria secretaria)
+            {
+                model.TipoFuncionario = "Secretaria";
+                model.Area = secretaria.Area;
+                model.DiretorId = secretaria.DiretorId;
+                model.Salario = secretaria.Salario;
+            }
+            else if (funcionario is Formador formador)
+            {
+                model.TipoFuncionario = "Formador";
+                model.AreaLecionada = formador.AreaLecionada;
+                model.TipoDisponibilidade = (Disponibilidade)formador.TipoDisponibilidade;
+                model.ValorHora = formador.ValorHora;
+                model.CoordenadorId = formador.CoordenadorId;
+            }
+            else if (funcionario is Coordenador coordenador)
+            {
+                model.TipoFuncionario = "Coordenador";
+                model.Salario = coordenador.Salario;
+            }
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, FuncionarioViewModel model)
+        {
+            // Segurança: Garantir que o ID do URL é igual ao ID do formulário escondido
+            if (id != model.Id) return NotFound();
+
+            if (ModelState.IsValid)
+            {
+                var funcionarioExistente = await _context.Funcionarios.FindAsync(id);
+                if (funcionarioExistente == null) return NotFound();
+
+                funcionarioExistente.Nome = model.Nome;
+                funcionarioExistente.Morada = model.Morada;
+                funcionarioExistente.Contacto = model.Contacto;
+                funcionarioExistente.DataFimContrato = model.DataFimContrato;
+                funcionarioExistente.DataRegistoCriminal = model.DataRegistoCriminal;
+
+                if (funcionarioExistente is Diretor diretor)
+                {
+                    diretor.IsencaoHorario = model.IsencaoHorario;
+                    diretor.BonusMensal = model.BonusMensal;
+                    diretor.CarroEmpresa = model.CarroEmpresa;
+                    diretor.Salario = model.Salario;
+                }
+                else if (funcionarioExistente is Secretaria secretaria)
+                {
+                    secretaria.Area = model.Area;
+                    secretaria.DiretorId = model.DiretorId;
+                    secretaria.Salario = model.Salario;
+                }
+                else if (funcionarioExistente is Formador formador)
+                {
+                    formador.AreaLecionada = model.AreaLecionada;
+                    formador.TipoDisponibilidade = (Disponibilidade)model.TipoDisponibilidade;
+                    formador.ValorHora = model.ValorHora;
+                    formador.CoordenadorId = model.CoordenadorId;
+                }
+                else if (funcionarioExistente is Coordenador coordenador)
+                {
+                    coordenador.Salario = model.Salario;
+                }
+
+                try
+                {
+                    _context.Update(funcionarioExistente);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    // Tratamento de erro caso o registo tenha sido apagado entretanto
+                    if (!_context.Funcionarios.Any(e => e.Id == id))
+                        return NotFound();
+                    else
+                        throw;
+                }
+
+                return RedirectToAction(nameof(Details), new { id = funcionarioExistente.Id });
+            }
+
+            model.ListaDiretores = _context.Diretores.Select(d => new SelectListItem { Value = d.Id.ToString(), Text = d.Nome }).ToList();
+            model.ListaCoordenadores = _context.Coordenadores.Select(c => new SelectListItem { Value = c.Id.ToString(), Text = c.Nome }).ToList();
+
+            return View(model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var funcionario = await _context.Funcionarios.FindAsync(id);
+            if (funcionario == null) return NotFound();
+
+            return View(funcionario);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var funcionario = await _context.Funcionarios.FindAsync(id);
+            if (funcionario != null)
+            {
+                _context.Funcionarios.Remove(funcionario);
+                await _context.SaveChangesAsync();
+            }
+            return RedirectToAction(nameof(Index));
+        }
     }
 }
