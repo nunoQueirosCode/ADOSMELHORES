@@ -18,6 +18,8 @@ namespace ADOSMELHORES.Data
         public DbSet<Formador> Formadores { get; set; }
         public DbSet<Coordenador> Coordenadores { get; set; }
 
+        public DbSet<Alocacao> Alocacoes { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Configurações, Aqui estamos dizendo que vai ser criada apenas uma tabela chamada Funcionarios
@@ -41,6 +43,13 @@ namespace ADOSMELHORES.Data
                 .WithMany(coordenador => coordenador.FormadoresAlocados)    // O coordenador tem uma lista de Formadores associada
                 .HasForeignKey(formador => formador.CoordenadorId)          // A FK na tabela formador
                 .OnDelete(DeleteBehavior.SetNull);                          // Se o coordenador for despedido, os formadores ficam sem coordenador (Null)
+
+            // Relação Formador e Alocação
+            modelBuilder.Entity<Alocacao>()
+                .HasOne(alocacao => alocacao.Formador)
+                .WithMany(formador => formador.Alocacoes)
+                .HasForeignKey(alocacao => alocacao.FormadorId)
+                .OnDelete(DeleteBehavior.SetNull); // <---  apenas limpa o ID
         }
     }
 }

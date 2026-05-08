@@ -17,5 +17,7 @@
 
         public int? CoordenadorId { get; set; }
         public Coordenador? Coordenador { get; set; }
+
+        public ICollection<Alocacao> Alocacoes { get; set; } = new List<Alocacao>();
     }
 }
