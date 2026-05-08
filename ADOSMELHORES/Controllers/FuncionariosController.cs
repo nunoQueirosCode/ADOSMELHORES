@@ -23,7 +23,7 @@ namespace ADOSMELHORES.Controllers
             return View(funcionarios);
         }
 
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(Guid? id)
         {
             if (id == null)
             {
@@ -194,7 +194,7 @@ namespace ADOSMELHORES.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, FuncionarioViewModel model)
+        public async Task<IActionResult> Edit(Guid id, FuncionarioViewModel model)
         {
             // Segurança: Garantir que o ID do URL é igual ao ID do formulário escondido
             if (id != model.Id) return NotFound();

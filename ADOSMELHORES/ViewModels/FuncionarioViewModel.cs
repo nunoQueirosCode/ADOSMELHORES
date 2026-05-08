@@ -7,7 +7,7 @@ namespace ADOSMELHORES.ViewModels
 {
     public class FuncionarioViewModel
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
         [Required(ErrorMessage = "Tem que selecionar o tipo de funcionário.")]
         public string TipoFuncionario { get; set; } = string.Empty;
@@ -29,14 +29,14 @@ namespace ADOSMELHORES.ViewModels
         public bool CarroEmpresa { get; set; }
         //Secretaria
         public string Area { get; set; } = string.Empty;
-        public int DiretorId { get; set; }
+        public Guid DiretorId { get; set; }
         public List<SelectListItem> ListaDiretores { get; set; } = new List<SelectListItem>();
 
         //Formador
         public string AreaLecionada { get; set; } = string.Empty;
         public Formador.Disponibilidade TipoDisponibilidade { get; set; } 
         public decimal ValorHora { get; set; }
-        public int? CoordenadorId { get; set; }
+        public Guid? CoordenadorId { get; set; }
         public List<SelectListItem> ListaCoordenadores { get; set; } = new List<SelectListItem>();
 
 
