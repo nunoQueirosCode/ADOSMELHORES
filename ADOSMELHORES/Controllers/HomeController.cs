@@ -1,6 +1,7 @@
 using ADOSMELHORES.Data;
 using ADOSMELHORES.Data.Empresa;
 using ADOSMELHORES.Models;
+using ADOSMELHORES.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
@@ -46,22 +47,21 @@ namespace ADOSMELHORES.Controllers
             var funcionarios = await _context.Funcionarios.Include("Alocacoes").ToListAsync();
             var hoje = DateTime.Now;
 
-            ViewBag.TotalDiretores = funcionarios.OfType<Diretor>().Sum(d => d.Salario + d.BonusMensal);
-            ViewBag.TotalSecretarias = funcionarios.OfType<Secretaria>().Sum(s => s.Salario);
-            ViewBag.TotalCoordenadores = funcionarios.OfType<Coordenador>().Sum(c => c.Salario);
+            var model = new HomeDashboardViewModel();
 
-            // Formadores (alocações do mês atual dentro da soma)
-            ViewBag.TotalFormadores = funcionarios.OfType<Formador>().Sum(f => f.Alocacoes?
+            model.TotalDiretores = funcionarios.OfType<Diretor>().Sum(d => d.Salario + d.BonusMensal);
+            model.TotalSecretarias = funcionarios.OfType<Secretaria>().Sum(s => s.Salario);
+            model.TotalCoordenadores = funcionarios.OfType<Coordenador>().Sum(c => c.Salario);
+
+            model.TotalFormadores = funcionarios.OfType<Formador>().Sum(f => f.Alocacoes?
                         .Where(a => a.DataInicio.Month == hoje.Month && a.DataInicio.Year == hoje.Year)
                         .Sum(a => ContarDiasUteis(a.DataInicio, a.DataFim) * 6 * f.ValorHora) ?? 0
                 );
 
-            // Totais
-            ViewBag.TotalGeral = (decimal)ViewBag.TotalDiretores + (decimal)ViewBag.TotalSecretarias +
-                                 (decimal)ViewBag.TotalCoordenadores + (decimal)ViewBag.TotalFormadores;
-            ViewBag.QtdFuncionarios = funcionarios.Count;
+            model.TotalGeral = model.TotalDiretores + model.TotalSecretarias + model.TotalCoordenadores + model.TotalFormadores;
+            model.QtdFuncionarios = funcionarios.Count;
 
-            return View();
+            return View(model);
         }
 
         private int ContarDiasUteis(DateTime inicio, DateTime fim)
