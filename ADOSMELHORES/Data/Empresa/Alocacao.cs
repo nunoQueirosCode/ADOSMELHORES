@@ -5,10 +5,10 @@ namespace ADOSMELHORES.Data.Empresa
     public class Alocacao
     {
         [Key]
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
         [Required]
-        public int? FormadorId { get; set; }
+        public Guid? FormadorId { get; set; }
         public Formador? Formador { get; set; }
 
         public decimal ValorHoraNoMomento { get; set; } // Importante para histórico de preços
