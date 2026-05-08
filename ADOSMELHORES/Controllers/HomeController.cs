@@ -21,8 +21,7 @@ namespace ADOSMELHORES.Controllers
             _context = context;
         }
 
-        [HttpPost]
-        public IActionResult AlterarData(DateTime novaData)
+        public IActionResult Index()
         {
             return View(DataSimulada);
         }
