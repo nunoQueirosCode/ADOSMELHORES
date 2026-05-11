@@ -141,6 +141,21 @@ namespace ADOSMELHORES.Controllers
             return RedirectToAction(nameof(Details), new {id = funcionario.Id}); 
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateContrato(Guid id, DateTime novaDataContrato)
+        {
+            var funcionario = await _context.Funcionarios.FirstOrDefaultAsync(f => f.Id == id);
+            if (funcionario == null) return NotFound();
+
+            funcionario.DataFimContrato = novaDataContrato;
+
+            _context.Update(funcionario);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Details), new { id = funcionario.Id });
+        }
+
         [HttpGet]
         public async Task<IActionResult> Edit(Guid? id)
         {
@@ -281,6 +296,62 @@ namespace ADOSMELHORES.Controllers
                 await _context.SaveChangesAsync();
             }
             return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CalcularVencimento(Guid id, DateTime dataInicio, DateTime dataFim)
+        {
+            // 1. Validar as datas
+            if (dataFim < dataInicio)
+            {
+                return Json(new { sucesso = false, mensagem = "A Data de Fim não pode ser anterior à Data de Início." });
+            }
+
+            if (id == null) return NotFound();
+
+            var formador = await _context.Formadores.FirstOrDefaultAsync(f => f.Id == id);
+
+            if (formador == null) return Json(new { sucesso = false, mensagem = "Formador não encontrado." });
+
+            decimal valorHora = formador.ValorHora;
+
+            int totalDias = (dataFim - dataInicio).Days + 1;
+            int horasPorDia = 6;
+
+            decimal valorTotal = totalDias * horasPorDia * valorHora;
+
+            return Json(new
+            {
+                sucesso = true,
+                valorTotalFormatado = valorTotal.ToString("C"),
+                detalhesCalculo = $"{totalDias} dias x {horasPorDia}h x {valorHora.ToString("C")}/h"
+            });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RemoverAssociacao(Guid formadorId, Guid coordenadorId)
+        {
+            try
+            {
+                if (formadorId == null || coordenadorId == null) return NotFound();
+
+                var formador = await _context.Formadores.FirstOrDefaultAsync(f => f.Id == formadorId);
+
+                //Verificar se formador existe
+                if (formador == null) return Json(new { sucesso = false, mensagem = "Formador não encontrado." });
+
+                //Remover a associação ao coordenador
+                formador.CoordenadorId = null;
+
+                _context.Update(formador);
+                await _context.SaveChangesAsync();
+
+                return RedirectToAction(nameof(Details), new { id = coordenadorId });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { sucesso = false, mensagem = "Erro interno do servidor: " + ex.Message });
+            }
         }
 
         [HttpGet]
