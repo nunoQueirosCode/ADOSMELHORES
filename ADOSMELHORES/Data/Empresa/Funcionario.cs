@@ -5,7 +5,7 @@ namespace ADOSMELHORES.Data.Empresa
     public abstract class Funcionario
     {
         [Key]
-        public int Id { get; set; }
+        public Guid Id { get; set; }= Guid.NewGuid();
 
         [Required]
         public string Nome { get; set; } = string.Empty;
