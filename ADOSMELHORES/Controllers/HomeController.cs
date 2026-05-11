@@ -3,6 +3,7 @@ using ADOSMELHORES.Data.Empresa;
 using ADOSMELHORES.Models;
 using ADOSMELHORES.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using System.Text;
@@ -20,8 +21,57 @@ namespace ADOSMELHORES.Controllers
             _context = context;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
+            var funcionarios = await _context.Funcionarios.Include("Alocacoes").ToListAsync();
+            var hoje = DateTime.Now;//dataSistema
+
+            var model = new HomeIndexViewModel();
+
+            decimal TotalDiretores = funcionarios.OfType<Diretor>().Sum(d => d.Salario + d.BonusMensal);
+            decimal TotalSecretarias = funcionarios.OfType<Secretaria>().Sum(s => s.Salario);
+            decimal TotalCoordenadores = funcionarios.OfType<Coordenador>().Sum(c => c.Salario);
+
+            DateTime inicioDoMes = new DateTime(hoje.Year, hoje.Month, 1);
+            DateTime fimDoMes = inicioDoMes.AddMonths(1).AddDays(-1);
+
+            decimal TotalFormadores = funcionarios.OfType<Formador>().Sum(f => f.Alocacoes?
+                .Where(a => a.DataInicio <= fimDoMes && a.DataFim >= inicioDoMes)
+                .Sum(a => {
+                    DateTime dataCalculoInicio = a.DataInicio < inicioDoMes ? inicioDoMes : a.DataInicio;
+                    DateTime dataCalculoFim = a.DataFim > fimDoMes ? fimDoMes : a.DataFim;
+                    return ContarDiasUteis(dataCalculoInicio, dataCalculoFim) * 6 * f.ValorHora;
+                }) ?? 0);
+
+            model.TotalGeral = TotalDiretores + TotalSecretarias + TotalCoordenadores + TotalFormadores;
+
+            model.QtdFuncionarios = funcionarios.Count();
+
+            model.QtdFuncionariosContratos = funcionarios.Count(f =>
+                f.DataFimContrato >= hoje &&
+                f.DataFimContrato <= hoje.AddDays(30));
+
+            model.QtdFuncionariosRegistoCriminal = funcionarios.Count(f => f.DataRegistoCriminal < hoje);
+
+            model.QtdDiretores = funcionarios.OfType<Diretor>().Count();
+            model.QtdCoordenadores = funcionarios.OfType<Coordenador>().Count();
+            model.QtdSecretarias = funcionarios.OfType<Secretaria>().Count();
+            model.QtdFormadores = funcionarios.OfType<Formador>().Count();
+
+            model.TabelaAlocacoes = funcionarios.OfType<Formador>()
+                    .SelectMany(f => f.Alocacoes, (f, a) => new { Funcionario = f, Alocacao = a })
+                    .Where(x => x.Alocacao.DataInicio <= hoje && x.Alocacao.DataFim >= hoje)
+                    .OrderBy(x => x.Alocacao.DataFim)
+                    .Take(6)
+                    .Select(x => new ItemAlocacaoViewModel
+                    {
+                        AlocacaoId = x.Alocacao.Id,
+                        NomeFuncionario = x.Funcionario.Nome, // Pegamos no nome do funcionário
+                        DataInicio = x.Alocacao.DataInicio,
+                        DataFim = x.Alocacao.DataFim
+                    })
+                    .ToList();
+
             return View(DataSimulada);
         }
 
@@ -50,12 +100,17 @@ namespace ADOSMELHORES.Controllers
             model.TotalSecretarias = funcionarios.OfType<Secretaria>().Sum(s => s.Salario);
             model.TotalCoordenadores = funcionarios.OfType<Coordenador>().Sum(c => c.Salario);
 
-            model.TotalFormadores = funcionarios.OfType<Formador>().Sum(f => f.Alocacoes?
-                        .Where(a => a.DataInicio.Month == hoje.Month && a.DataInicio.Year == hoje.Year)
-                        .Sum(a => ContarDiasUteis(a.DataInicio, a.DataFim) * 6 * f.ValorHora) ?? 0
-                );
+            DateTime inicioDoMes = new DateTime(hoje.Year, hoje.Month, 1);
+            DateTime fimDoMes = inicioDoMes.AddMonths(1).AddDays(-1);
 
-            model.TotalGeral = model.TotalDiretores + model.TotalSecretarias + model.TotalCoordenadores + model.TotalFormadores;
+            model.TotalFormadores = funcionarios.OfType<Formador>().Sum(f => f.Alocacoes?
+                .Where(a => a.DataInicio <= fimDoMes && a.DataFim >= inicioDoMes)
+                .Sum(a => {DateTime dataCalculoInicio = a.DataInicio < inicioDoMes ? inicioDoMes : a.DataInicio;
+                           DateTime dataCalculoFim = a.DataFim > fimDoMes ? fimDoMes : a.DataFim;
+                           return ContarDiasUteis(dataCalculoInicio, dataCalculoFim) * 6 * f.ValorHora;
+                           }) ?? 0);
+
+                        model.TotalGeral = model.TotalDiretores + model.TotalSecretarias + model.TotalCoordenadores + model.TotalFormadores;
             model.QtdFuncionarios = funcionarios.Count;
 
             return View(model);
