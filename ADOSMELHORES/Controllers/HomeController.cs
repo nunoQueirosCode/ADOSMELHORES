@@ -37,9 +37,7 @@ namespace ADOSMELHORES.Controllers
             ViewBag.DataSistema = dataAtualDoSistema.ToString("yyyy-MM-dd");
             ViewBag.DataSistemaFormatada = dataAtualDoSistema.ToString("dd 'de' MMMM, yyyy");
 
-            return View();
             var funcionarios = await _context.Funcionarios.Include("Alocacoes").ToListAsync();
-            var hoje = DateTime.Now;//dataSistema
 
             var model = new HomeIndexViewModel();
 
@@ -47,7 +45,7 @@ namespace ADOSMELHORES.Controllers
             decimal TotalSecretarias = funcionarios.OfType<Secretaria>().Sum(s => s.Salario);
             decimal TotalCoordenadores = funcionarios.OfType<Coordenador>().Sum(c => c.Salario);
 
-            DateTime inicioDoMes = new DateTime(hoje.Year, hoje.Month, 1);
+            DateTime inicioDoMes = new DateTime(dataAtualDoSistema.Year, dataAtualDoSistema.Month, 1);
             DateTime fimDoMes = inicioDoMes.AddMonths(1).AddDays(-1);
 
             decimal TotalFormadores = funcionarios.OfType<Formador>().Sum(f => f.Alocacoes?
@@ -63,10 +61,10 @@ namespace ADOSMELHORES.Controllers
             model.QtdFuncionarios = funcionarios.Count();
 
             model.QtdFuncionariosContratos = funcionarios.Count(f =>
-                f.DataFimContrato >= hoje &&
-                f.DataFimContrato <= hoje.AddDays(30));
+                f.DataFimContrato >= dataAtualDoSistema &&
+                f.DataFimContrato <= dataAtualDoSistema.AddDays(30));
 
-            model.QtdFuncionariosRegistoCriminal = funcionarios.Count(f => f.DataRegistoCriminal < hoje);
+            model.QtdFuncionariosRegistoCriminal = funcionarios.Count(f => f.DataRegistoCriminal < dataAtualDoSistema);
 
             model.QtdDiretores = funcionarios.OfType<Diretor>().Count();
             model.QtdCoordenadores = funcionarios.OfType<Coordenador>().Count();
@@ -75,7 +73,7 @@ namespace ADOSMELHORES.Controllers
 
             model.TabelaAlocacoes = funcionarios.OfType<Formador>()
                     .SelectMany(f => f.Alocacoes, (f, a) => new { Funcionario = f, Alocacao = a })
-                    .Where(x => x.Alocacao.DataInicio <= hoje && x.Alocacao.DataFim >= hoje)
+                    .Where(x => x.Alocacao.DataInicio <= dataAtualDoSistema && x.Alocacao.DataFim >= dataAtualDoSistema)
                     .OrderBy(x => x.Alocacao.DataFim)
                     .Take(6)
                     .Select(x => new ItemAlocacaoViewModel
@@ -87,7 +85,7 @@ namespace ADOSMELHORES.Controllers
                     })
                     .ToList();
 
-            return View(DataSimulada);
+            return View(model);
         }
 
         [HttpPost]
@@ -113,8 +111,20 @@ namespace ADOSMELHORES.Controllers
 
         public async Task<IActionResult> CalcularDespesaMensal()
         {
+            string dataCookie = Request.Cookies["DataSistema"];
+            DateTime dataAtualDoSistema;
+
+            if (string.IsNullOrEmpty(dataCookie))
+            {
+                dataAtualDoSistema = DateTime.Today;
+
+                Response.Cookies.Append("DataSistema", dataAtualDoSistema.ToString("yyyy-MM-dd"));
+            }
+            else
+            {
+                dataAtualDoSistema = DateTime.Parse(dataCookie);
+            }
             var funcionarios = await _context.Funcionarios.Include("Alocacoes").ToListAsync();
-            var hoje = DateTime.Now;//dataSistema
 
             var model = new HomeDashboardViewModel();
 
@@ -122,7 +132,7 @@ namespace ADOSMELHORES.Controllers
             model.TotalSecretarias = funcionarios.OfType<Secretaria>().Sum(s => s.Salario);
             model.TotalCoordenadores = funcionarios.OfType<Coordenador>().Sum(c => c.Salario);
 
-            DateTime inicioDoMes = new DateTime(hoje.Year, hoje.Month, 1);
+            DateTime inicioDoMes = new DateTime(dataAtualDoSistema.Year, dataAtualDoSistema.Month, 1);
             DateTime fimDoMes = inicioDoMes.AddMonths(1).AddDays(-1);
 
             model.TotalFormadores = funcionarios.OfType<Formador>().Sum(f => f.Alocacoes?
