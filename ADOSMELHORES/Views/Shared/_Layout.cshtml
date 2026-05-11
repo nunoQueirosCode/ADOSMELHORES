@@ -17,6 +17,11 @@
     @await RenderSectionAsync("Styles", required: false) <!-- Necessário para conseguir ter CSS dentro das VIEWS -->
 </head>
 <body>
+    @{
+        // Descobre em que Controller e Action estamos atualmente
+        var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+        var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+    }
 
     <div class="wrapper">
         
@@ -31,12 +36,12 @@
 
             <ul class="sidebar-menu">
                 <li>
-                    <a class="sidebar-link active" asp-area="" asp-controller="Home" asp-action="Index">
+                    <a class="sidebar-link @(currentController == "Home" ? "active" : "") " asp-area="" asp-controller="Home" asp-action="Index">
                         <i class="fa-solid fa-chart-pie"></i> Dashboard
                     </a>
                 </li>
                 <li>
-                    <a class="sidebar-link" asp-area="" asp-controller="Funcionarios" asp-action="Index">
+                    <a class="sidebar-link @(currentController == "Funcionarios" ? "active" : "") " asp-area="" asp-controller="Funcionarios" asp-action="Index">
                         <i class="fa-solid fa-users"></i> Funcionários
                     </a>
                 </li>

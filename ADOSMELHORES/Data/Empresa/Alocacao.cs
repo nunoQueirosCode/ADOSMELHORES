@@ -7,7 +7,6 @@ namespace ADOSMELHORES.Data.Empresa
         [Key]
         public Guid Id { get; set; }
 
-        [Required]
         public Guid? FormadorId { get; set; }
         public Formador? Formador { get; set; }
 
