@@ -9,7 +9,7 @@ namespace ADOSMELHORES.Data.Empresa
 
         public decimal Salario { get; set; }
 
-        public string Area { get; set; } = string.Empty;
+        public string? Area { get; set; } = string.Empty;
 
         public Guid DiretorId { get; set; }
 

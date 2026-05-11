@@ -28,12 +28,12 @@ namespace ADOSMELHORES.ViewModels
         public decimal BonusMensal { get; set; }
         public bool CarroEmpresa { get; set; }
         //Secretaria
-        public string Area { get; set; } = string.Empty;
+        public string? Area { get; set; } = string.Empty;
         public Guid DiretorId { get; set; }
         public List<SelectListItem> ListaDiretores { get; set; } = new List<SelectListItem>();
 
         //Formador
-        public string AreaLecionada { get; set; } = string.Empty;
+        public string? AreaLecionada { get; set; } = string.Empty;
         public Formador.Disponibilidade TipoDisponibilidade { get; set; } 
         public decimal ValorHora { get; set; }
         public Guid? CoordenadorId { get; set; }

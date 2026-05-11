@@ -39,7 +39,7 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-bold">Data Fim de Contrato</label>
-                            <input type="date" asp-for="DataFimContrato" class="form-control" />
+                            <input type="date" asp-for="DataFimContrato" class="form-control"/>
                             <span asp-validation-for="DataFimContrato" class="text-danger"></span>
                         </div>
                         <div class="col-md-6">
@@ -98,10 +98,7 @@
                         <h5 class="text-primary mb-3">Detalhes de Secretaria</h5>
                         <div class="mb-3">
                             <label class="form-label fw-bold">Reporta ao Diretor:</label>
-                            <select asp-for="DiretorId" class="form-select">
-                                <option value="">-- Selecione o Diretor --</option>
-                                <option value="1">Diretor Geral</option>
-                                <option value="2">Diretor Financeiro</option>
+                            <select asp-for="DiretorId" class="form-select" asp-items="@Model.ListaDiretores">
                             </select>
                             <span asp-validation-for="DiretorId" class="text-danger"></span>
                         </div>
@@ -117,14 +114,12 @@
                         <div class="mb-3">
                             <label class="form-label fw-bold">Área que Leciona</label>
                             <input type="text" asp-for="AreaLecionada" class="form-control" placeholder="Ex: Programação, Design">
-							<span asp-validation-for="AreaLecionada" class="text-danger"></span>
+							<span asp-validation-for="AreaLecionada" class="text-danger"></span>    
                         </div>
                         <div class="mb-3">
                             <label class="form-label fw-bold">Disponibilidade</label>
-                            <select asp-for="TipoDisponibilidade" class="form-select">
-                                <option value="Laboral">Laboral</option>
-                                <option value="PosLaboral">Pós-Laboral</option>
-                                <option value="Ambas">Ambas</option>
+                            <select asp-for="TipoDisponibilidade" class="form-select" asp-items="Html.GetEnumSelectList<ADOSMELHORES.Data.Empresa.Formador.Disponibilidade>()">
+                                
                             </select>
                         </div>
                         <div class="mb-3">

@@ -101,8 +101,8 @@ namespace ADOSMELHORES.Controllers
                         break;
                 }
 
-                if (novoFuncionario != null)
-                {
+                
+                    novoFuncionario.Id = Guid.NewGuid();
                     novoFuncionario.Nome = model.Nome;
                     novoFuncionario.Morada = model.Morada;
                     novoFuncionario.Contacto = model.Contacto;
@@ -112,7 +112,7 @@ namespace ADOSMELHORES.Controllers
                     _context.Add(novoFuncionario);
                     await _context.SaveChangesAsync();
                     return RedirectToAction(nameof(Details), new { id = novoFuncionario.Id });
-                }
+              
             }
 
             model.ListaDiretores = _context.Diretores
@@ -180,7 +180,7 @@ namespace ADOSMELHORES.Controllers
             {
                 model.TipoFuncionario = "Diretor";
                 model.IsencaoHorario = diretor.IsencaoHorario;
-                model.BonusMensal = diretor.BonusMensal;
+                model.BonusMensal = (decimal)diretor.BonusMensal;
                 model.CarroEmpresa = diretor.CarroEmpresa;
                 model.Salario = diretor.Salario;
             }
@@ -388,7 +388,7 @@ namespace ADOSMELHORES.Controllers
                 {
                     salario = d.Salario.ToString("F2");
                     isencaoHorario = d.IsencaoHorario.ToString();
-                    bonusMensal = d.BonusMensal.ToString("F2");
+                    bonusMensal = d.BonusMensal.HasValue ? d.BonusMensal.Value.ToString("F2") : "null";
                     carroEmpresa = d.CarroEmpresa.ToString();
                 }
                 else if (funcionario is Secretaria s)

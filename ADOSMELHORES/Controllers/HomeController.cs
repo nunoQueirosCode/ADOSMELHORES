@@ -41,7 +41,7 @@ namespace ADOSMELHORES.Controllers
 
             var model = new HomeIndexViewModel();
 
-            decimal TotalDiretores = funcionarios.OfType<Diretor>().Sum(d => d.Salario + d.BonusMensal);
+            decimal TotalDiretores = funcionarios.OfType<Diretor>().Sum(d => d.Salario + (d.BonusMensal ?? 0));
             decimal TotalSecretarias = funcionarios.OfType<Secretaria>().Sum(s => s.Salario);
             decimal TotalCoordenadores = funcionarios.OfType<Coordenador>().Sum(c => c.Salario);
 
@@ -128,7 +128,7 @@ namespace ADOSMELHORES.Controllers
 
             var model = new HomeDashboardViewModel();
 
-            model.TotalDiretores = funcionarios.OfType<Diretor>().Sum(d => d.Salario + d.BonusMensal);
+            model.TotalDiretores = funcionarios.OfType<Diretor>().Sum(d => d.Salario + (d.BonusMensal ?? 0));
             model.TotalSecretarias = funcionarios.OfType<Secretaria>().Sum(s => s.Salario);
             model.TotalCoordenadores = funcionarios.OfType<Coordenador>().Sum(c => c.Salario);
 
@@ -206,7 +206,7 @@ namespace ADOSMELHORES.Controllers
                 {
                     salario = d.Salario.ToString("F2");
                     isencaoHorario = d.IsencaoHorario.ToString();
-                    bonusMensal = d.BonusMensal.ToString("F2");
+                    bonusMensal = d.BonusMensal.HasValue ? d.BonusMensal.Value.ToString("F2") : "null";
                     carroEmpresa = d.CarroEmpresa.ToString();
                 }
                 else if (funcionario is Secretaria s)

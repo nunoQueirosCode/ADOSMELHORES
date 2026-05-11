@@ -11,7 +11,7 @@ namespace ADOSMELHORES.Data.Empresa
             Ambas
         }
 
-        public string AreaLecionada { get; set; } = string.Empty;
+        public string? AreaLecionada { get; set; } = string.Empty;
 
         public Disponibilidade TipoDisponibilidade { get; set; }
         
