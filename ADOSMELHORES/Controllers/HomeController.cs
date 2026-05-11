@@ -13,8 +13,6 @@ namespace ADOSMELHORES.Controllers
     {
         private readonly EmpresaContext _context;
 
-        public static DateTime DataSimulada = DateTime.Now;
-
         public HomeController(EmpresaContext context)
         {
             _context = context;
@@ -22,21 +20,44 @@ namespace ADOSMELHORES.Controllers
 
         public IActionResult Index()
         {
-            return View(DataSimulada);
+            string dataCookie = Request.Cookies["DataSistema"];
+            DateTime dataAtualDoSistema;
+
+            if (string.IsNullOrEmpty(dataCookie))
+            {
+                dataAtualDoSistema = DateTime.Today;
+
+                Response.Cookies.Append("DataSistema", dataAtualDoSistema.ToString("yyyy-MM-dd"));
+            }
+            else
+            {
+                dataAtualDoSistema = DateTime.Parse(dataCookie);
+            }
+            ViewBag.DataSistema = dataAtualDoSistema.ToString("yyyy-MM-dd");
+            ViewBag.DataSistemaFormatada = dataAtualDoSistema.ToString("dd 'de' MMMM, yyyy");
+
+            return View();
         }
 
         [HttpPost]
-        public IActionResult AlterarData(DateTime novaData)
+        public IActionResult DefinirDataSistema(DateTime novaDataSistema)
         {
-            DataSimulada = novaData;
-            return Json(DataSimulada);
+            CookieOptions options = new CookieOptions
+            {
+                Expires = DateTime.Now.AddDays(30),
+                HttpOnly = true
+            };
+
+            Response.Cookies.Append("DataSistema", novaDataSistema.ToString("yyyy-MM-dd"), options);
+
+            return RedirectToAction(nameof(Index)); 
         }
 
         [HttpPost]
         public IActionResult ResetarData()
         {
-            DataSimulada = DateTime.Now;
-            return Json(DataSimulada);
+            Response.Cookies.Delete("DataSistema");
+            return RedirectToAction(nameof(Index));
         }
 
         public async Task<IActionResult> CalcularDespesaMensal()
