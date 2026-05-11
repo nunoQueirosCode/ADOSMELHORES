@@ -70,7 +70,7 @@
                             <i class="fa-solid fa-calculator"></i> Calcular Vencimento
                         </button>
                     @*}*@
-                    <a asp-action="Edit" asp-route-id="@*Model?.Id*@" class="btn btn-ados btn-sm me-2">
+                    <a asp-action="Edit" asp-route-id="qwerqwer" class="btn btn-ados btn-sm me-2">
                         <i class="fa-solid fa-pen"></i> Editar
                     </a>
                     <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modalDelete">
@@ -448,7 +448,7 @@
 
                 // 3. Fazer o pedido AJAX
                 $.ajax({
-                    url: '/FuncionariosController/RemoverAssociacaoAPI', // Caminho para o teu método no Controller
+                    url: '/FuncionariosController/RemoverAssociacao', // Caminho para o teu método no Controller
                     type: 'POST',
                     data: {
                         formadorId: formadorId,

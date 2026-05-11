@@ -1,4 +1,4 @@
-﻿
+﻿@model ADOSMELHORES.ViewModels.FuncionarioViewModel
 @{
     ViewData["Title"] = "Novo Funcionário";
 }
@@ -24,27 +24,33 @@
                     <div class="row g-3">
                         <div class="col-md-12">
                             <label class="form-label fw-bold">Nome Completo</label>
-                            <input type="text" name="Nome" class="form-control" placeholder="Ex: João Silva" required />
+                            <input type="text" asp-for="Nome" class="form-control" placeholder="Ex: João Silva" />
+                            <span asp-validation-for="Nome" class="text-danger"></span>
                         </div>
                         <div class="col-md-12">
                             <label class="form-label fw-bold">Morada</label>
-                            <input type="text" name="Morada" class="form-control" placeholder="Rua, Número, Código Postal" />
+                            <input type="text" asp-for="Morada" class="form-control" placeholder="Rua, Número, Código Postal" />
+                            <span asp-validation-for="Morada" class="text-danger"></span>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-bold">Contacto Telefónico</label>
-                            <input type="tel" name="Contacto" class="form-control" placeholder="9xxxxxxxx" />
+                            <input type="tel" asp-for="Contacto" class="form-control" placeholder="9xxxxxxxx" />
+                            <span asp-validation-for="Contacto" class="text-danger"></span>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-bold">Data Fim de Contrato</label>
-                            <input type="date" name="DataFimContrato" class="form-control" />
+                            <input type="date" asp-for="DataFimContrato" class="form-control" />
+                            <span asp-validation-for="DataFimContrato" class="text-danger"></span>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-bold">Data Registo Criminal</label>
-                            <input type="date" name="DataRegistoCriminal" class="form-control" required />
+                            <input type="date" asp-for="DataRegistoCriminal" class="form-control" />
+                            <span asp-validation-for="DataRegistoCriminal" class="text-danger"></span>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-bold">Salário Base (€)</label>
-                            <input type="number" step="0.01" name="SalarioBase" id="SalarioBase" class="form-control" placeholder="0.00" />
+                            <input type="number" step="0.01" asp-for="Salario" id="SalarioBase" class="form-control" placeholder="0.00" />
+							<span asp-validation-for="Salario" class="text-danger"></span>
                         </div>
                     </div>
                 </div>
@@ -59,13 +65,14 @@
                 <div class="card-body p-4">
                     <div class="mb-4">
                         <label class="form-label fw-bold text-primary">Selecione o Tipo de Funcionário</label>
-                        <select id="SelectTipoFuncionario" name="TipoFuncionario" class="form-select form-select-lg border-primary">
+                        <select id="SelectTipoFuncionario" asp-for="TipoFuncionario" class="form-select form-select-lg border-primary">
                             <option value="">-- Selecione um cargo --</option>
                             <option value="Diretor">Diretor</option>
                             <option value="Secretaria">Secretaria</option>
                             <option value="Formador">Formador</option>
                             <option value="Coordenador">Coordenador</option>
                         </select>
+                        <span asp-validation-for="TipoFuncionario" class="text-danger"></span>
                     </div>
 
                     <hr />
@@ -73,16 +80,17 @@
                     <div id="SecaoDiretor" class="secao-especifica d-none">
                         <h5 class="text-primary mb-3">Detalhes de Direção</h5>
                         <div class="form-check form-switch mb-3">
-                            <input class="form-check-input" type="checkbox" id="IsencaoHorario" name="IsencaoHorario">
+                            <input class="form-check-input" type="checkbox" id="IsencaoHorario" asp-for="IsencaoHorario">
                             <label class="form-check-label" for="IsencaoHorario">Isenção de Horário</label>
                         </div>
                         <div class="form-check form-switch mb-3">
-                            <input class="form-check-input" type="checkbox" id="CarroEmpresa" name="CarroEmpresa">
+                            <input class="form-check-input" type="checkbox" id="CarroEmpresa" asp-for="CarroEmpresa">
                             <label class="form-check-label" for="CarroEmpresa">Carro da Empresa</label>
                         </div>
                         <div class="mb-3">
                             <label class="form-label fw-bold">Bónus Mensal (€)</label>
-                            <input type="number" name="BonusMensal" class="form-control" placeholder="0.00">
+                            <input type="number" asp-for="BonusMensal" class="form-control" placeholder="0.00">
+                            <span asp-validation-for="BonusMensal" class="text-danger"></span>
                         </div>
                     </div>
 
@@ -90,15 +98,17 @@
                         <h5 class="text-primary mb-3">Detalhes de Secretaria</h5>
                         <div class="mb-3">
                             <label class="form-label fw-bold">Reporta ao Diretor:</label>
-                            <select name="DiretorId" class="form-select">
+                            <select asp-for="DiretorId" class="form-select">
                                 <option value="">-- Selecione o Diretor --</option>
                                 <option value="1">Diretor Geral</option>
                                 <option value="2">Diretor Financeiro</option>
                             </select>
+                            <span asp-validation-for="DiretorId" class="text-danger"></span>
                         </div>
                         <div class="mb-3">
                             <label class="form-label fw-bold">Área de Atuação</label>
-                            <input type="text" name="AreaSecretaria" class="form-control" placeholder="Ex: Financeira, RH">
+                            <input type="text" asp-for="Area" class="form-control" placeholder="Ex: Financeira, RH">
+                            <span asp-validation-for="Area" class="text-danger"></span>
                         </div>
                     </div>
 
@@ -106,11 +116,12 @@
                         <h5 class="text-primary mb-3">Detalhes de Formação</h5>
                         <div class="mb-3">
                             <label class="form-label fw-bold">Área que Leciona</label>
-                            <input type="text" name="AreaLeciona" class="form-control" placeholder="Ex: Programação, Design">
+                            <input type="text" asp-for="AreaLecionada" class="form-control" placeholder="Ex: Programação, Design">
+							<span asp-validation-for="AreaLecionada" class="text-danger"></span>
                         </div>
                         <div class="mb-3">
                             <label class="form-label fw-bold">Disponibilidade</label>
-                            <select name="Disponibilidade" class="form-select">
+                            <select asp-for="TipoDisponibilidade" class="form-select">
                                 <option value="Laboral">Laboral</option>
                                 <option value="PosLaboral">Pós-Laboral</option>
                                 <option value="Ambas">Ambas</option>
@@ -118,7 +129,8 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label fw-bold">Valor Hora (€)</label>
-                            <input type="number" name="ValorHora" class="form-control" placeholder="0.00">
+                            <input type="number" asp-for="ValorHora" class="form-control" placeholder="0.00">
+							<span asp-validation-for="ValorHora" class="text-danger"></span>
                         </div>
                     </div>
 
