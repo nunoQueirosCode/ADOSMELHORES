@@ -97,11 +97,10 @@
                         <h5 class="text-primary mb-3">Detalhes de Secretaria</h5>
                         <div class="mb-3">
                             <label class="form-label fw-bold">Reporta ao Diretor:</label>
-                            <select asp-for="DiretorId" class="form-select">
+                            <select asp-for="DiretorId" class="form-select" asp-items="@Model.ListaDiretores">
                                 <option value="">-- Selecione o Diretor --</option>
-                                <option value="1">Diretor Geral</option>
-                                <option value="2">Diretor Financeiro</option>
                             </select>
+                            <span asp-validation-for="DiretorId" class="text-danger"></span>
                         </div>
                         <div class="mb-3">
                             <label class="form-label fw-bold">Área de Atuação</label>
