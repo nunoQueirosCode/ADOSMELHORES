@@ -128,7 +128,7 @@ namespace ADOSMELHORES.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateRegistoCriminal(int id, DateTime novaDataRegisto)
+        public async Task<IActionResult> UpdateRegistoCriminal(Guid id, DateTime novaDataRegisto)
         {
             var funcionario = await _context.Funcionarios.FindAsync(id);
             if (funcionario == null) return NotFound();
@@ -142,7 +142,7 @@ namespace ADOSMELHORES.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(Guid? id)
         {
             if (id == null) return NotFound();
 
