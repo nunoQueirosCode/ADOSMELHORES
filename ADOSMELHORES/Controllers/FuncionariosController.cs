@@ -101,7 +101,8 @@ namespace ADOSMELHORES.Controllers
                         break;
                 }
 
-                
+                if (novoFuncionario != null)
+                {
                     novoFuncionario.Id = Guid.NewGuid();
                     novoFuncionario.Nome = model.Nome;
                     novoFuncionario.Morada = model.Morada;
@@ -296,6 +297,23 @@ namespace ADOSMELHORES.Controllers
                 await _context.SaveChangesAsync();
             }
             return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AlocacaoFuncionario(Guid id, DateTime dataInicio, DateTime dataFim, string descricao)
+        {
+            var novaAlocacao = new Alocacao
+            {
+                Id = Guid.NewGuid(),
+                FormadorId = id,
+                DataInicio = dataInicio,
+                DataFim = dataFim,
+                DescricaoFormacao = descricao
+            };
+
+            _context.Add(novaAlocacao);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Details), new { id = id});
         }
 
         [HttpPost]

@@ -1,4 +1,5 @@
-﻿@{
+﻿@model ADOSMELHORES.ViewModels.FuncionarioViewModel
+@{
     ViewData["Title"] = "Editar Funcionário";
 }
 
@@ -14,9 +15,9 @@
 
 <form asp-action="Edit" method="post">
     
-    <input type="hidden" name="Id" value="1" />
+    <input type="hidden" asp-for="Id" />
     
-    <input type="hidden" name="TipoFuncionario" id="TipoFuncionarioHidden" value="Formador" />
+    <input type="hidden" asp-for="TipoFuncionario" id="TipoFuncionarioHidden" />
 
     <div class="row">
         <div class="col-lg-7">
@@ -28,27 +29,32 @@
                     <div class="row g-3">
                         <div class="col-md-12">
                             <label class="form-label fw-bold">Nome Completo</label>
-                            <input type="text" name="Nome" class="form-control" value="João Silva" required />
+                            <input type="text" asp-for="Nome" class="form-control" value="@Model.Nome" />
                         </div>
                         <div class="col-md-12">
                             <label class="form-label fw-bold">Morada</label>
-                            <input type="text" name="Morada" class="form-control" value="Rua da Formação, 123" />
+                            <input type="text" asp-for="Morada" class="form-control" value="@Model.Morada" />
+                            <span asp-validation-for="Morada" class="text-danger"></span>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-bold">Contacto Telefónico</label>
-                            <input type="tel" name="Contacto" class="form-control" value="912345678" />
+                            <input type="tel" asp-for="Contacto" class="form-control" value="@Model.Contacto" />
+                            <span asp-validation-for="Contacto" class="text-danger"></span>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-bold">Data Fim de Contrato</label>
-                            <input type="date" name="DataFimContrato" class="form-control" value="2025-12-31" />
+                            <input type="date" asp-for="DataFimContrato" class="form-control" value="@Model.DataFimContrato" />
+                            <span asp-validation-for="DataFimContrato" class="text-danger"></span>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-bold">Data Registo Criminal</label>
-                            <input type="date" name="DataRegistoCriminal" class="form-control" value="2024-06-15" required />
+                            <input type="date" asp-for="DataRegistoCriminal" class="form-control" value="@Model.DataRegistoCriminal" required />
+                            <span asp-validation-for="DataRegistoCriminal" class="text-danger"></span>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-bold">Salário Base (€)</label>
-                            <input type="number" step="0.01" name="SalarioBase" id="SalarioBase" class="form-control" />
+                            <input type="number" step="0.01" asp-for="Salario" id="SalarioBase" class="form-control" value="@Model.Salario" />
+                            <span asp-validation-for="Salario" class="text-danger"></span>
                         </div>
                     </div>
                 </div>
@@ -59,8 +65,7 @@
             <div class="card card-ados mb-4 border-primary" style="border-width: 2px !important;">
                 <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                     <span><i class="fa-solid fa-briefcase me-2"></i>Cargo e Especialização</span>
-                    
-                    <span class="badge bg-light text-primary border border-light">Formador</span>
+                    <span class="badge bg-light text-primary border border-light">@Model.TipoFuncionario</span>
                 </div>
                 <div class="card-body p-4">
                     
@@ -74,16 +79,17 @@
                     <div id="SecaoDiretor" class="secao-especifica d-none">
                         <h5 class="text-primary mb-3">Detalhes de Direção</h5>
                         <div class="form-check form-switch mb-3">
-                            <input class="form-check-input" type="checkbox" name="IsencaoHorario">
-                            <label class="form-check-label">Isenção de Horário</label>
+                            <input class="form-check-input" type="checkbox" asp-for="IsencaoHorario" id="IsencaoHorario">
+                            <label class="form-check-label" for="IsencaoHorario">Isenção de Horário</label>
                         </div>
                         <div class="form-check form-switch mb-3">
-                            <input class="form-check-input" type="checkbox" name="CarroEmpresa">
-                            <label class="form-check-label">Carro da Empresa</label>
+                            <input class="form-check-input" type="checkbox" asp-for="CarroEmpresa" id="CarroEmpresa">
+                            <label class="form-check-label" for="CarroEmpresa">Carro da Empresa</label>
                         </div>
                         <div class="mb-3">
                             <label class="form-label fw-bold">Bónus Mensal (€)</label>
-                            <input type="number" step="0.01" name="BonusMensal" class="form-control">
+                            <input type="number" step="0.01" asp-for="BonusMensal" class="form-control" value="@Model.BonusMensal">
+                            <span asp-validation-for="BonusMensal" class="text-danger"></span>
                         </div>
                     </div>
 
@@ -91,15 +97,15 @@
                         <h5 class="text-primary mb-3">Detalhes de Secretaria</h5>
                         <div class="mb-3">
                             <label class="form-label fw-bold">Reporta ao Diretor:</label>
-                            <select name="DiretorId" class="form-select">
+                            <select asp-for="DiretorId" class="form-select" asp-items="@Model.ListaDiretores">
                                 <option value="">-- Selecione o Diretor --</option>
-                                <option value="1">Diretor Geral</option>
-                                <option value="2">Diretor Financeiro</option>
                             </select>
+                            <span asp-validation-for="DiretorId" class="text-danger"></span>
                         </div>
                         <div class="mb-3">
                             <label class="form-label fw-bold">Área de Atuação</label>
-                            <input type="text" name="AreaSecretaria" class="form-control">
+                            <input type="text" asp-for="Area" class="form-control" placeholder="Ex: Financeira, RH">
+                            <span asp-validation-for="Area" class="text-danger"></span>
                         </div>
                     </div>
 
@@ -107,11 +113,12 @@
                         <h5 class="text-primary mb-3">Detalhes de Formação</h5>
                         <div class="mb-3">
                             <label class="form-label fw-bold">Área que Leciona</label>
-                            <input type="text" name="AreaLeciona" class="form-control" value="Programação Web">
+                            <input type="text" asp-for="Area" class="form-control">
+                            <span asp-validation-for="Area" class="text-danger"></span>
                         </div>
                         <div class="mb-3">
                             <label class="form-label fw-bold">Disponibilidade</label>
-                            <select name="Disponibilidade" class="form-select">
+                            <select asp-for="TipoDisponibilidade" class="form-select">
                                 <option value="Laboral">Laboral</option>
                                 <option value="PosLaboral" selected>Pós-Laboral</option>
                                 <option value="Ambas">Ambas</option>
@@ -119,7 +126,8 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label fw-bold">Valor Hora (€)</label>
-                            <input type="number" step="0.01" name="ValorHora" class="form-control" value="25.00">
+                            <input type="number" step="0.01" asp-for="ValorHora" class="form-control" value="@Model.ValorHora">
+                            <span asp-validation-for="ValorHora" class="text-danger"></span>
                         </div>
                     </div>
 
