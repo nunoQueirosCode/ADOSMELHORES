@@ -260,7 +260,7 @@ namespace ADOSMELHORES.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(Guid id)
         {
             if (id == null) return NotFound();
 
@@ -272,7 +272,7 @@ namespace ADOSMELHORES.Controllers
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
             var funcionario = await _context.Funcionarios.FindAsync(id);
             if (funcionario != null)

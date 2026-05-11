@@ -11,15 +11,12 @@ namespace ADOSMELHORES.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
-        
         private readonly EmpresaContext _context;
 
         public static DateTime DataSimulada = DateTime.Now;
 
-        public HomeController(ILogger<HomeController> logger, EmpresaContext context)
+        public HomeController(EmpresaContext context)
         {
-            _logger = logger;
             _context = context;
         }
 
@@ -45,7 +42,7 @@ namespace ADOSMELHORES.Controllers
         public async Task<IActionResult> CalcularDespesaMensal()
         {
             var funcionarios = await _context.Funcionarios.Include("Alocacoes").ToListAsync();
-            var hoje = DateTime.Now;
+            var hoje = DateTime.Now;//dataSistema
 
             var model = new HomeDashboardViewModel();
 
