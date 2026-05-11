@@ -8,7 +8,7 @@ using static ADOSMELHORES.Data.Empresa.Formador;
 
 namespace ADOSMELHORES.Controllers
 {
-    public class FuncionariosController : Controller
+    public class FuncionariosController : BaseController
     {
         private readonly EmpresaContext _context;
 
