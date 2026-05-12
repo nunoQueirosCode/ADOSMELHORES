@@ -320,6 +320,11 @@ namespace ADOSMELHORES.Controllers
         [HttpPost]
         public async Task<IActionResult> AlocacaoFuncionario(Guid id, DateTime dataInicio, DateTime dataFim, string descricao)
         {
+            if (dataFim < dataInicio)
+            {
+                return Json(new { sucesso = false, mensagem = "A Data de Fim não pode ser anterior à Data de Início." });
+            }
+
             var novaAlocacao = new Alocacao
             {
                 Id = Guid.NewGuid(),
