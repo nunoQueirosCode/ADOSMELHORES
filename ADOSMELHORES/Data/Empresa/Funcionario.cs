@@ -20,5 +20,7 @@ namespace ADOSMELHORES.Data.Empresa
 
         [DataType(DataType.Date)]
         public DateTime DataRegistoCriminal { get; set; }
+
+
     }
 }

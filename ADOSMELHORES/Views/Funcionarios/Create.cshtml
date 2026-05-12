@@ -1,6 +1,8 @@
 ﻿@model ADOSMELHORES.ViewModels.FuncionarioViewModel
 @{
     ViewData["Title"] = "Novo Funcionário";
+    var dataSistemaStr = Context.Request.Cookies["DataSistema"];
+    DateTime dataReferencia = DateTime.TryParse(dataSistemaStr, out DateTime dt) ? dt : DateTime.Today;
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -39,12 +41,12 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-bold">Data Fim de Contrato</label>
-                            <input type="date" asp-for="DataFimContrato" class="form-control"/>
+                            <input type="date" asp-for="DataFimContrato" class="form-control" value="@dataReferencia.ToString("yyyy-MM-dd")"/>
                             <span asp-validation-for="DataFimContrato" class="text-danger"></span>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-bold">Data Registo Criminal</label>
-                            <input type="date" asp-for="DataRegistoCriminal" class="form-control" />
+                            <input type="date" asp-for="DataRegistoCriminal" class="form-control" value="@dataReferencia.ToString("yyyy-MM-dd")" />
                             <span asp-validation-for="DataRegistoCriminal" class="text-danger"></span>
                         </div>
                         <div class="col-md-6">
@@ -111,6 +113,12 @@
 
                     <div id="SecaoFormador" class="secao-especifica d-none">
                         <h5 class="text-primary mb-3">Detalhes de Formação</h5>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Reporta ao Diretor:</label>
+                            <select asp-for="CoordenadorId" class="form-select" asp-items="@Model.ListaCoordenadores">
+                            </select>
+                            <span asp-validation-for="CoordenadorId" class="text-danger"></span>
+                        </div>
                         <div class="mb-3">
                             <label class="form-label fw-bold">Área que Leciona</label>
                             <input type="text" asp-for="AreaLecionada" class="form-control" placeholder="Ex: Programação, Design">
