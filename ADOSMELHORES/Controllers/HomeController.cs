@@ -24,21 +24,7 @@ namespace ADOSMELHORES.Controllers
 
         public async Task<IActionResult> Index()
         {
-            string dataCookie = Request.Cookies["DataSistema"];
-            DateTime dataAtualDoSistema;
-
-            if (string.IsNullOrEmpty(dataCookie))
-            {
-                dataAtualDoSistema = DateTime.Today;
-
-                Response.Cookies.Append("DataSistema", dataAtualDoSistema.ToString("yyyy-MM-dd"));
-            }
-            else
-            {
-                dataAtualDoSistema = DateTime.Parse(dataCookie);
-            }
-            ViewBag.DataSistema = dataAtualDoSistema.ToString("yyyy-MM-dd");
-            ViewBag.DataSistemaFormatada = dataAtualDoSistema.ToString("dd 'de' MMMM, yyyy");
+            DateTime dataAtualDoSistema = ObterDataDoSistema();
 
             var funcionarios = await ObterFuncionariosDaCache();
 
@@ -96,7 +82,7 @@ namespace ADOSMELHORES.Controllers
         {
             CookieOptions options = new CookieOptions
             {
-                Expires = DateTime.Now.AddDays(30),
+                Expires = DateTime.Now.AddMinutes(30),
                 HttpOnly = true
             };
 
@@ -109,24 +95,15 @@ namespace ADOSMELHORES.Controllers
         public IActionResult ResetarData()
         {
             Response.Cookies.Delete("DataSistema");
+
             return RedirectToAction(nameof(Index));
         }
 
         public async Task<IActionResult> CalcularDespesaMensal()
         {
-            string dataCookie = Request.Cookies["DataSistema"];
-            DateTime dataAtualDoSistema;
+   
+            DateTime dataAtualDoSistema = ObterDataDoSistema();
 
-            if (string.IsNullOrEmpty(dataCookie))
-            {
-                dataAtualDoSistema = DateTime.Today;
-
-                Response.Cookies.Append("DataSistema", dataAtualDoSistema.ToString("yyyy-MM-dd"));
-            }
-            else
-            {
-                dataAtualDoSistema = DateTime.Parse(dataCookie);
-            }
             var funcionarios = await ObterFuncionariosDaCache();
 
             var model = new HomeDashboardViewModel();
@@ -245,18 +222,34 @@ namespace ADOSMELHORES.Controllers
         }
         private async Task<List<Funcionario>> ObterFuncionariosDaCache()
         {
-            // Pergunta à cache: "Tens a ListaFuncionariosCache guardada?"
             if (!_cache.TryGetValue(CacheKeys.ListaFuncionarios, out List<Funcionario> funcionarios))
             {
-                // Se não tem, vamos à Base de Dados. 
-                // E trazemos TUDO o que os vários controllers precisam, incluindo as Alocações.
                 funcionarios = await _context.Funcionarios.Include("Alocacoes").ToListAsync();
 
-                // Guardamos no pote para os próximos pedidos (do Home ou do FuncionariosController)
                 _cache.Set(CacheKeys.ListaFuncionarios, funcionarios);
             }
 
             return funcionarios;
+        }
+        public DateTime ObterDataDoSistema()
+        {
+            string dataCookie = Request.Cookies["DataSistema"];
+            DateTime dataAtualDoSistema;
+
+            if (string.IsNullOrEmpty(dataCookie) || !DateTime.TryParse(dataCookie, out dataAtualDoSistema))
+            {
+                dataAtualDoSistema = DateTime.Today;
+
+                CookieOptions options = new CookieOptions
+                {
+                    Expires = DateTime.Now.AddMinutes(30),
+                    HttpOnly = true
+                };
+
+                Response.Cookies.Append("DataSistema", dataAtualDoSistema.ToString("yyyy-MM-dd"), options);
+            }
+
+            return dataAtualDoSistema;
         }
     }
 }
