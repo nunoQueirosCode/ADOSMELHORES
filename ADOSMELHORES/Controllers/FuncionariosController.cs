@@ -31,7 +31,13 @@ namespace ADOSMELHORES.Controllers
                 return NotFound();
             }
 
-            var funcionario = await _context.Funcionarios.FirstOrDefaultAsync(a => a.Id == id);
+            // Usamos o .Include para carregar o Coordenador (caso seja Formador) 
+            // e os FormadoresAssociados (caso seja Coordenador)
+            var funcionario = await _context.Funcionarios
+                .Include(f => (f as Formador).Coordenador)
+                .Include(f => (f as Coordenador).FormadoresAlocados)
+                .Include(f => (f as Formador).Alocacoes)
+                .FirstOrDefaultAsync(a => a.Id == id);
 
             if (funcionario == null)
             {
@@ -81,7 +87,7 @@ namespace ADOSMELHORES.Controllers
                         {
                             Salario = model.Salario,
                             Area = model.Area,
-                            DiretorId = model.DiretorId
+                            DiretorId = (Guid)model.DiretorId
                         };
                         break;
                     case "Formador":
@@ -238,7 +244,7 @@ namespace ADOSMELHORES.Controllers
                 else if (funcionarioExistente is Secretaria secretaria)
                 {
                     secretaria.Area = model.Area;
-                    secretaria.DiretorId = model.DiretorId;
+                    secretaria.DiretorId = (Guid)model.DiretorId;
                     secretaria.Salario = model.Salario;
                 }
                 else if (funcionarioExistente is Formador formador)
@@ -276,18 +282,8 @@ namespace ADOSMELHORES.Controllers
             return View(model);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Delete(Guid id)
-        {
-            if (id == null) return NotFound();
-
-            var funcionario = await _context.Funcionarios.FindAsync(id);
-            if (funcionario == null) return NotFound();
-
-            return View(funcionario);
-        }
-
-        [HttpPost, ActionName("Delete")]
+       
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
@@ -301,12 +297,12 @@ namespace ADOSMELHORES.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AlocacaoFuncionario(Guid id, DateTime dataInicio, DateTime dataFim, string descricao)
+        public async Task<IActionResult> AlocacaoFuncionario(Guid idFormador, DateTime dataInicio, DateTime dataFim, string descricao)
         {
             var novaAlocacao = new Alocacao
             {
                 Id = Guid.NewGuid(),
-                FormadorId = id,
+                FormadorId = idFormador,
                 DataInicio = dataInicio,
                 DataFim = dataFim,
                 DescricaoFormacao = descricao
@@ -314,7 +310,7 @@ namespace ADOSMELHORES.Controllers
 
             _context.Add(novaAlocacao);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Details), new { id = id});
+            return RedirectToAction(nameof(Details), new { id = idFormador });
         }
 
         [HttpPost]
@@ -365,7 +361,7 @@ namespace ADOSMELHORES.Controllers
                 _context.Update(formador);
                 await _context.SaveChangesAsync();
 
-                return RedirectToAction(nameof(Details), new { id = coordenadorId });
+                return Json(new { sucesso = true });
             }
             catch (Exception ex)
             {
