@@ -1,4 +1,5 @@
-﻿@{
+﻿@model ADOSMELHORES.ViewModels.HomeIndexViewModel
+@{
     ViewData["Title"] = "Dashboard Geral";
 }
 
@@ -7,10 +8,7 @@
         <h2 style="color: var(--azul-conhecimento); font-weight: 700; margin-bottom: 0;">Visão Geral</h2>
         <span class="text-muted">Resumo de Ativos e Recursos Humanos da ADOSMELHORES</span>
     </div>
-    <div class="text-end">
-        <span class="text-muted small d-block">Data do Sistema</span>
-        <strong style="color: var(--ciano-evolucao);">@DateTime.Now.ToString("dd 'de' MMMM, yyyy")</strong>
-    </div>
+
 </div>
 
 <div class="row g-4 mb-4">
@@ -21,14 +19,11 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
                         <p class="text-muted text-uppercase small fw-bold mb-1">Total Funcionários</p>
-                        <h2 class="mb-0 fw-bold" style="color: var(--azul-conhecimento);">124</h2>
+                        <h2 class="mb-0 fw-bold" style="color: var(--azul-conhecimento);">@Model.QtdFuncionarios </h2>
                     </div>
                     <div class="bg-light rounded-circle d-flex justify-content-center align-items-center" style="width: 50px; height: 50px; color: var(--azul-conhecimento); font-size: 1.5rem;">
                         <i class="fa-solid fa-users"></i>
                     </div>
-                </div>
-                <div class="mt-3 text-muted small">
-                    <span class="text-success"><i class="fa-solid fa-arrow-trend-up me-1"></i>+3</span> desde o mês passado
                 </div>
             </div>
         </div>
@@ -40,7 +35,7 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
                         <p class="text-muted text-uppercase small fw-bold mb-1">Despesa Salarial</p>
-                        <h2 class="mb-0 fw-bold" style="color: var(--azul-conhecimento);">42K €</h2>
+                        <h2 class="mb-0 fw-bold" style="color: var(--azul-conhecimento);">@Model.TotalGeral €</h2>
                     </div>
                     <div class="bg-light rounded-circle d-flex justify-content-center align-items-center" style="width: 50px; height: 50px; color: var(--ciano-evolucao); font-size: 1.5rem;">
                         <i class="fa-solid fa-euro-sign"></i>
@@ -59,7 +54,7 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
                         <p class="text-muted text-uppercase small fw-bold mb-1">Contratos a Expirar</p>
-                        <h2 class="mb-0 fw-bold text-warning">8</h2>
+                        <h2 class="mb-0 fw-bold text-warning">@Model.QtdFuncionariosContratos</h2>
                     </div>
                     <div class="bg-warning bg-opacity-10 rounded-circle d-flex justify-content-center align-items-center" style="width: 50px; height: 50px; color: var(--dourado-excelencia); font-size: 1.5rem;">
                         <i class="fa-solid fa-file-contract"></i>
@@ -78,7 +73,7 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
                         <p class="text-muted text-uppercase small fw-bold mb-1">Reg. Criminais Expirados</p>
-                        <h2 class="mb-0 fw-bold text-danger">3</h2>
+                        <h2 class="mb-0 fw-bold text-danger">@Model.QtdFuncionariosRegistoCriminal</h2>
                     </div>
                     <div class="bg-danger bg-opacity-10 rounded-circle d-flex justify-content-center align-items-center" style="width: 50px; height: 50px; color: #ef4444; font-size: 1.5rem;">
                         <i class="fa-solid fa-triangle-exclamation"></i>
@@ -109,53 +104,50 @@
     <div class="col-lg-7">
         <div class="card card-ados h-100">
             <div class="card-header card-ados-header bg-white d-flex justify-content-between align-items-center">
-                <span><i class="fa-solid fa-bell me-2"></i>Avisos Pendentes</span>
+                <span><i class="fa-solid fa-bell me-2"></i>Formações a decorrer</span>
                 <button class="btn btn-sm btn-light border">Ver Todos</button>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light text-muted small text-uppercase">
+                    <table class="table table-hover mb-0 align-middle">
+                        <thead class="table-light">
                             <tr>
                                 <th class="ps-4">Funcionário</th>
-                                <th>Tipo de Aviso</th>
-                                <th>Data Limite</th>
+                                <th>Data Início</th>
+                                <th>Data Fim</th>
                                 <th class="text-end pe-4">Ação</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td class="ps-4 fw-bold">Carlos Pereira</td>
-                                <td><span class="badge bg-danger bg-opacity-10 text-danger border border-danger">Reg. Criminal Expirado</span></td>
-                                <td class="text-danger fw-bold">10/05/2026</td>
-                                <td class="text-end pe-4">
-                                    <a href="#" class="btn btn-sm btn-light text-info"><i class="fa-solid fa-eye"></i></a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="ps-4 fw-bold">Ana Silva</td>
-                                <td><span class="badge bg-warning bg-opacity-10 text-warning border border-warning">Fim de Contrato</span></td>
-                                <td class="text-warning">25/05/2026</td>
-                                <td class="text-end pe-4">
-                                    <a href="#" class="btn btn-sm btn-light text-info"><i class="fa-solid fa-eye"></i></a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="ps-4 fw-bold">João Marques</td>
-                                <td><span class="badge bg-danger bg-opacity-10 text-danger border border-danger">Reg. Criminal Expirado</span></td>
-                                <td class="text-danger fw-bold">12/04/2026</td>
-                                <td class="text-end pe-4">
-                                    <a href="#" class="btn btn-sm btn-light text-info"><i class="fa-solid fa-eye"></i></a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="ps-4 fw-bold">Marta Sousa</td>
-                                <td><span class="badge bg-primary bg-opacity-10 text-primary border border-primary">Falta Assinatura Ativo</span></td>
-                                <td class="text-muted">A aguardar</td>
-                                <td class="text-end pe-4">
-                                    <a href="#" class="btn btn-sm btn-light text-info"><i class="fa-solid fa-eye"></i></a>
-                                </td>
-                            </tr>
+                            @if (Model.TabelaAlocacoes != null && Model.TabelaAlocacoes.Any())
+                            {
+                                foreach (var alocacao in Model.TabelaAlocacoes)
+                                {
+                                    <tr>
+                                        <td class="ps-4">
+                                            <div class="fw-semibold text-dark">@alocacao.NomeFuncionario</div>
+                                        </td>
+                                        <td>
+                                            <span class="text-muted small"><i class="fa-regular fa-calendar me-1"></i>@alocacao.DataInicio.ToString("dd/MM/yyyy")</span>
+                                        </td>
+                                        <td>
+                                            <span class="text-muted small"><i class="fa-regular fa-calendar-check me-1"></i>@alocacao.DataFim.ToString("dd/MM/yyyy")</span>
+                                        </td>
+                                        <td class="text-end pe-4">
+                                            <a href="#" class="btn btn-sm btn-light border text-primary">Detalhes</a>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="4" class="text-center py-4 text-muted">
+                                        <i class="fa-regular fa-folder-open mb-2 fs-4 d-block"></i>
+                                        Nenhuma formação a decorrer no momento.
+                                    </td>
+                                </tr>
+                            }
                         </tbody>
                     </table>
                 </div>
@@ -163,21 +155,6 @@
         </div>
     </div>
 
-</div>
-
-<div class="row g-4">
-    <div class="col-12">
-        <div class="card border-0 bg-transparent">
-            <div class="d-flex gap-3">
-                <a asp-controller="Funcionarios" asp-action="Create" class="btn btn-ados py-2 px-4 shadow-sm">
-                    <i class="fa-solid fa-user-plus me-2"></i>Novo Funcionário
-                </a>
-                <button class="btn btn-ados-outline py-2 px-4 shadow-sm bg-white">
-                    <i class="fa-solid fa-laptop-medical me-2"></i>Registar Ativo
-                </button>
-            </div>
-        </div>
-    </div>
 </div>
 
 @section Scripts {
@@ -190,9 +167,9 @@
 
             // Dados estáticos para o gráfico (Mais tarde podes injetar os valores do C# aqui)
             var dadosCargos = {
-                labels: ['Formadores', 'Secretariado', 'Coordenadores', 'Diretores'],
+                labels: ['Formadores', 'Secretarias', 'Coordenadores', 'Diretores'],
                 datasets: [{
-                    data: [85, 20, 15, 4], // Os teus números estáticos
+                    data: [@Model.QtdFormadores, @Model.QtdSecretarias, @Model.QtdCoordenadores, @Model.QtdDiretores], // Os teus números estáticos
                     backgroundColor: [
                         '#06B6D4', // Ciano Evolução (Maioria Formadores)
                         '#F59E0B', // Dourado Excelência
