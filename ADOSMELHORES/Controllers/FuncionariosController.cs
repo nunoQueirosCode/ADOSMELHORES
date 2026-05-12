@@ -292,8 +292,25 @@ namespace ADOSMELHORES.Controllers
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
             var funcionario = await _context.Funcionarios.FindAsync(id);
+
             if (funcionario != null)
             {
+                if (funcionario is Diretor)
+                {
+                    var secretariasAfetadas = _context.Secretarias.Where(s => s.DiretorId == id);
+                    foreach (var sec in secretariasAfetadas)
+                    {
+                        sec.DiretorId = null;
+                    }
+                }
+                if (funcionario is Coordenador)
+                {
+                    var formadoresAfetados = _context.Formadores.Where(f => f.CoordenadorId == id);
+                    foreach (var form in formadoresAfetados)
+                    {
+                        form.CoordenadorId = null;
+                    }
+                }
                 _context.Funcionarios.Remove(funcionario);
                 await _context.SaveChangesAsync();
             }

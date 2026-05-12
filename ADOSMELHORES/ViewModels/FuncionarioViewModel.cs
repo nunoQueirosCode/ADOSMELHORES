@@ -29,7 +29,7 @@ namespace ADOSMELHORES.ViewModels
         public bool CarroEmpresa { get; set; }
         //Secretaria
         public string? Area { get; set; } = string.Empty;
-        public Guid DiretorId { get; set; }
+        public Guid? DiretorId { get; set; }
         public List<SelectListItem> ListaDiretores { get; set; } = new List<SelectListItem>();
 
         //Formador

@@ -109,7 +109,7 @@ namespace ADOSMELHORES.Migrations
                 {
                     b.HasBaseType("ADOSMELHORES.Data.Empresa.Funcionario");
 
-                    b.Property<decimal>("BonusMensal")
+                    b.Property<decimal?>("BonusMensal")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<bool>("CarroEmpresa")
@@ -129,7 +129,6 @@ namespace ADOSMELHORES.Migrations
                     b.HasBaseType("ADOSMELHORES.Data.Empresa.Funcionario");
 
                     b.Property<string>("AreaLecionada")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("CoordenadorId")
@@ -151,10 +150,9 @@ namespace ADOSMELHORES.Migrations
                     b.HasBaseType("ADOSMELHORES.Data.Empresa.Funcionario");
 
                     b.Property<string>("Area")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("DiretorId")
+                    b.Property<Guid?>("DiretorId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<decimal>("Salario")
@@ -196,8 +194,7 @@ namespace ADOSMELHORES.Migrations
                     b.HasOne("ADOSMELHORES.Data.Empresa.Diretor", "DiretorQueReporta")
                         .WithMany("Secretarias")
                         .HasForeignKey("DiretorId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("DiretorQueReporta");
                 });
