@@ -231,7 +231,7 @@ namespace ADOSMELHORES.Controllers
 
             return funcionarios;
         }
-        public DateTime ObterDataDoSistema()
+        protected DateTime ObterDataDoSistema()
         {
             string dataCookie = Request.Cookies["DataSistema"];
             DateTime dataAtualDoSistema;
