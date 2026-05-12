@@ -1,9 +1,11 @@
 ﻿using ADOSMELHORES.Data;
 using ADOSMELHORES.Data.Empresa;
+using ADOSMELHORES.Models;
 using ADOSMELHORES.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using System.Text;
 using static ADOSMELHORES.Data.Empresa.Formador;
 
@@ -12,15 +14,17 @@ namespace ADOSMELHORES.Controllers
     public class FuncionariosController : Controller
     {
         private readonly EmpresaContext _context;
+        private readonly IMemoryCache _cache;
 
-        public FuncionariosController(EmpresaContext context)
+        public FuncionariosController(EmpresaContext context, IMemoryCache cache)
         {
             _context = context;
+            _cache = cache;
         }
 
         public async Task<IActionResult> Index()
         {
-            var funcionarios = await _context.Funcionarios.ToListAsync();
+            var funcionarios = await ObterFuncionariosDaCache();
             return View(funcionarios);
         }
 
@@ -30,14 +34,9 @@ namespace ADOSMELHORES.Controllers
             {
                 return NotFound();
             }
+            var funcionarios = await ObterFuncionariosDaCache();
 
-            // Usamos o .Include para carregar o Coordenador (caso seja Formador) 
-            // e os FormadoresAssociados (caso seja Coordenador)
-            var funcionario = await _context.Funcionarios
-                .Include(f => (f as Formador).Coordenador)
-                .Include(f => (f as Coordenador).FormadoresAlocados)
-                .Include(f => (f as Formador).Alocacoes)
-                .FirstOrDefaultAsync(a => a.Id == id);
+            var funcionario = funcionarios.FirstOrDefault(a => a.Id == id);
 
             if (funcionario == null)
             {
@@ -48,15 +47,17 @@ namespace ADOSMELHORES.Controllers
         }
 
         [HttpGet]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
             var model = new FuncionarioViewModel();
 
-            model.ListaDiretores = _context.Diretores
+            var funcionarios = await ObterFuncionariosDaCache();
+
+            model.ListaDiretores = funcionarios.OfType<Diretor>()
                 .Select(d => new SelectListItem { Value = d.Id.ToString(), Text = d.Nome })
                 .ToList();
 
-            model.ListaCoordenadores = _context.Coordenadores
+            model.ListaCoordenadores = funcionarios.OfType<Coordenador>()
                 .Select(c => new SelectListItem { Value = c.Id.ToString(), Text = c.Nome })
                 .ToList();
 
@@ -118,16 +119,21 @@ namespace ADOSMELHORES.Controllers
 
                     _context.Add(novoFuncionario);
                     await _context.SaveChangesAsync();
+
+                    _cache.Remove(CacheKeys.ListaFuncionarios);
+
                     return RedirectToAction(nameof(Details), new { id = novoFuncionario.Id });
                 }
               
             }
 
-            model.ListaDiretores = _context.Diretores
+            var funcionarios = await ObterFuncionariosDaCache();
+
+            model.ListaDiretores = funcionarios.OfType<Diretor>()
                 .Select(d => new SelectListItem { Value = d.Id.ToString(), Text = d.Nome })
                 .ToList();
 
-            model.ListaCoordenadores = _context.Coordenadores
+            model.ListaCoordenadores = funcionarios.OfType<Coordenador>()
                 .Select(c => new SelectListItem { Value = c.Id.ToString(), Text = c.Nome })
                 .ToList();
 
@@ -138,13 +144,18 @@ namespace ADOSMELHORES.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateRegistoCriminal(Guid id, DateTime novaDataRegisto)
         {
-            var funcionario = await _context.Funcionarios.FindAsync(id);
+            var funcionarios = await ObterFuncionariosDaCache();
+
+            var funcionario = funcionarios.FirstOrDefault(a => a.Id == id);
+
             if (funcionario == null) return NotFound();
 
             funcionario.DataRegistoCriminal = novaDataRegisto;
 
             _context.Update(funcionario);
             await _context.SaveChangesAsync();
+
+            _cache.Remove(CacheKeys.ListaFuncionarios);
 
             return RedirectToAction(nameof(Details), new {id = funcionario.Id}); 
         }
@@ -153,13 +164,18 @@ namespace ADOSMELHORES.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateContrato(Guid id, DateTime novaDataContrato)
         {
-            var funcionario = await _context.Funcionarios.FirstOrDefaultAsync(f => f.Id == id);
+            var funcionarios = await ObterFuncionariosDaCache();
+
+            var funcionario = funcionarios.FirstOrDefault(a => a.Id == id);
+
             if (funcionario == null) return NotFound();
 
             funcionario.DataFimContrato = novaDataContrato;
 
             _context.Update(funcionario);
             await _context.SaveChangesAsync();
+
+            _cache.Remove(CacheKeys.ListaFuncionarios);
 
             return RedirectToAction(nameof(Details), new { id = funcionario.Id });
         }
@@ -169,7 +185,10 @@ namespace ADOSMELHORES.Controllers
         {
             if (id == null) return NotFound();
 
-            var funcionario = await _context.Funcionarios.FindAsync(id);
+            var funcionarios = await ObterFuncionariosDaCache();
+
+            var funcionario = funcionarios.FirstOrDefault(a => a.Id == id);
+
             if (funcionario == null) return NotFound();
 
             var model = new FuncionarioViewModel
@@ -225,7 +244,10 @@ namespace ADOSMELHORES.Controllers
 
             if (ModelState.IsValid)
             {
-                var funcionarioExistente = await _context.Funcionarios.FindAsync(id);
+                var funcionarios = await ObterFuncionariosDaCache();
+
+                var funcionarioExistente = funcionarios.FirstOrDefault(a => a.Id == id);
+
                 if (funcionarioExistente == null) return NotFound();
 
                 funcionarioExistente.Nome = model.Nome;
@@ -263,11 +285,13 @@ namespace ADOSMELHORES.Controllers
                 {
                     _context.Update(funcionarioExistente);
                     await _context.SaveChangesAsync();
+
+                    _cache.Remove(CacheKeys.ListaFuncionarios);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
                     // Tratamento de erro caso o registo tenha sido apagado entretanto
-                    if (!_context.Funcionarios.Any(e => e.Id == id))
+                    if (!funcionarios.Any(e => e.Id == id))
                         return NotFound();
                     else
                         throw;
@@ -275,9 +299,10 @@ namespace ADOSMELHORES.Controllers
 
                 return RedirectToAction(nameof(Details), new { id = funcionarioExistente.Id });
             }
+            var listaFuncionarios = await ObterFuncionariosDaCache();
 
-            model.ListaDiretores = _context.Diretores.Select(d => new SelectListItem { Value = d.Id.ToString(), Text = d.Nome }).ToList();
-            model.ListaCoordenadores = _context.Coordenadores.Select(c => new SelectListItem { Value = c.Id.ToString(), Text = c.Nome }).ToList();
+            model.ListaDiretores = listaFuncionarios.OfType<Diretor>().Select(d => new SelectListItem { Value = d.Id.ToString(), Text = d.Nome }).ToList();
+            model.ListaCoordenadores = listaFuncionarios.OfType<Coordenador>().Select(c => new SelectListItem { Value = c.Id.ToString(), Text = c.Nome }).ToList();
 
             return View(model);
         }
@@ -287,11 +312,32 @@ namespace ADOSMELHORES.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
-            var funcionario = await _context.Funcionarios.FindAsync(id);
+            var funcionarios = await ObterFuncionariosDaCache();
+
+            var funcionario = funcionarios.FirstOrDefault(a => a.Id == id);
+
             if (funcionario != null)
             {
+                if (funcionario is Diretor)
+                {
+                    var secretariasAfetadas = funcionarios.OfType<Secretaria>().Where(s => s.DiretorId == id);
+                    foreach (var sec in secretariasAfetadas)
+                    {
+                        sec.DiretorId = null;
+                    }
+                }
+                if (funcionario is Coordenador)
+                {
+                    var formadoresAfetados = funcionarios.OfType<Formador>().Where(f => f.CoordenadorId == id);
+                    foreach (var form in formadoresAfetados)
+                    {
+                        form.CoordenadorId = null;
+                    }
+                }
                 _context.Funcionarios.Remove(funcionario);
                 await _context.SaveChangesAsync();
+
+                _cache.Remove(CacheKeys.ListaFuncionarios);
             }
             return RedirectToAction(nameof(Index));
         }
@@ -299,6 +345,11 @@ namespace ADOSMELHORES.Controllers
         [HttpPost]
         public async Task<IActionResult> AlocacaoFuncionario(Guid idFormador, DateTime dataInicio, DateTime dataFim, string descricao)
         {
+            if (dataFim < dataInicio)
+            {
+                return Json(new { sucesso = false, mensagem = "A Data de Fim não pode ser anterior à Data de Início." });
+            }
+
             var novaAlocacao = new Alocacao
             {
                 Id = Guid.NewGuid(),
@@ -310,13 +361,16 @@ namespace ADOSMELHORES.Controllers
 
             _context.Add(novaAlocacao);
             await _context.SaveChangesAsync();
+
+            _cache.Remove(CacheKeys.ListaFuncionarios);
+
+            return RedirectToAction(nameof(Details), new { id = id});
             return RedirectToAction(nameof(Details), new { id = idFormador });
         }
 
         [HttpPost]
-        public async Task<IActionResult> CalcularVencimento(Guid id, DateTime dataInicio, DateTime dataFim)
+        public async Task<IActionResult> CalcularVencimento(Guid? id, DateTime dataInicio, DateTime dataFim)
         {
-            // 1. Validar as datas
             if (dataFim < dataInicio)
             {
                 return Json(new { sucesso = false, mensagem = "A Data de Fim não pode ser anterior à Data de Início." });
@@ -324,7 +378,9 @@ namespace ADOSMELHORES.Controllers
 
             if (id == null) return NotFound();
 
-            var formador = await _context.Formadores.FirstOrDefaultAsync(f => f.Id == id);
+            var funcionarios = await ObterFuncionariosDaCache();
+
+            var formador = funcionarios.OfType<Formador>().FirstOrDefault(a => a.Id == id);
 
             if (formador == null) return Json(new { sucesso = false, mensagem = "Formador não encontrado." });
 
@@ -344,23 +400,26 @@ namespace ADOSMELHORES.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> RemoverAssociacao(Guid formadorId, Guid coordenadorId)
+        public async Task<IActionResult> RemoverAssociacao(Guid? formadorId, Guid? coordenadorId)
         {
             try
             {
                 if (formadorId == null || coordenadorId == null) return NotFound();
 
-                var formador = await _context.Formadores.FirstOrDefaultAsync(f => f.Id == formadorId);
+                var funcionarios = await ObterFuncionariosDaCache();
 
-                //Verificar se formador existe
+                var formador = funcionarios.OfType<Formador>().FirstOrDefault(a => a.Id == formadorId);
+
                 if (formador == null) return Json(new { sucesso = false, mensagem = "Formador não encontrado." });
 
-                //Remover a associação ao coordenador
                 formador.CoordenadorId = null;
 
                 _context.Update(formador);
                 await _context.SaveChangesAsync();
 
+                _cache.Remove(CacheKeys.ListaFuncionarios);
+
+                return RedirectToAction(nameof(Details), new { id = coordenadorId });
                 return Json(new { sucesso = true });
             }
             catch (Exception ex)
@@ -435,6 +494,17 @@ namespace ADOSMELHORES.Controllers
 
             var conteudo = Encoding.UTF8.GetBytes(csv.ToString());
             return File(conteudo, "text/csv", $"Funcionarios_{DateTime.Now:yyyyMMdd_HHmmss}.csv");
+        }
+        private async Task<List<Funcionario>> ObterFuncionariosDaCache()
+        {
+            if (!_cache.TryGetValue(CacheKeys.ListaFuncionarios, out List<Funcionario> funcionarios))
+            {
+                funcionarios = await _context.Funcionarios.Include("Alocacoes").ToListAsync();
+
+                _cache.Set(CacheKeys.ListaFuncionarios, funcionarios);
+            }
+
+            return funcionarios;
         }
     }
 }
