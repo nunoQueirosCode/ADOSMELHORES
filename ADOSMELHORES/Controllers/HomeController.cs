@@ -68,6 +68,7 @@ namespace ADOSMELHORES.Controllers
                     .Select(x => new ItemAlocacaoViewModel
                     {
                         AlocacaoId = x.Alocacao.Id,
+                        Descricao = x.Alocacao.DescricaoFormacao,
                         NomeFuncionario = x.Funcionario.Nome, // Pegamos no nome do funcionário
                         DataInicio = x.Alocacao.DataInicio,
                         DataFim = x.Alocacao.DataFim
@@ -91,8 +92,7 @@ namespace ADOSMELHORES.Controllers
             return RedirectToAction(nameof(Index)); 
         }
 
-        [HttpPost]
-        public IActionResult ResetarData()
+        public IActionResult ResetData()
         {
             Response.Cookies.Delete("DataSistema");
 
