@@ -37,6 +37,7 @@ namespace ADOSMELHORES.Controllers
             var alocacao = await _context.Alocacoes.FindAsync(id);
             if (alocacao != null)
             {
+            try { 
                 var funcionarios = await ObterFuncionariosDaCache();
 
                 var alocacaoExisteNaCache = funcionarios
@@ -63,6 +64,7 @@ namespace ADOSMELHORES.Controllers
             {
                 return Json(new { sucesso = false, mensagem = "Erro ao eliminar alocação: " + ex.Message });
             }
+        }
 
             return Json(new { sucesso = false, mensagem = "Não encontrada" });
         }
