@@ -15,10 +15,16 @@
         public int QtdFuncionariosContratos { get; set; }
         public int QtdFuncionariosRegistoCriminal { get; set; }
         public int QtdDiretores { get; set; }
-
+        public decimal TotalDiretores { get; set; }
         public int QtdCoordenadores { get; set; }
+        public decimal TotalCoordenadores { get; set; }
         public int QtdSecretarias { get; set; }
+        public decimal TotalSecretarias { get; set; }
+
         public int QtdFormadores { get; set; }
+
+        public decimal TotalFormadores { get; set; }
+
         public List<ItemAlocacaoViewModel>? TabelaAlocacoes { get; set; }
 
     }
