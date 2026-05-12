@@ -3,22 +3,29 @@ using ADOSMELHORES.Data.Empresa;
 using ADOSMELHORES.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace ADOSMELHORES.Controllers
 {
     public class AlocacaoController : Controller
     {
         private readonly EmpresaContext _context;
+        private readonly IMemoryCache _cache;
         
-        public AlocacaoController(EmpresaContext context)
+        public AlocacaoController(EmpresaContext context, IMemoryCache cache)
         {
             _context = context;
+            _cache = cache;
         }
         public async Task<IActionResult> Index()
         {
-            var alocacoes = await _context.Alocacoes
-                .Include(a => a.Formador)
-                .ToListAsync();
+            var funcionarios = await ObterFuncionariosDaCache();
+
+            var alocacoes = funcionarios
+                .OfType<Formador>()
+                .Where(f => f.Alocacoes != null)
+                .SelectMany(f => f.Alocacoes)
+                .ToList();
 
 
             return View(alocacoes);
@@ -30,13 +37,25 @@ namespace ADOSMELHORES.Controllers
         {
             try
             {
-                var alocacao = await _context.Alocacoes.FindAsync(id);
+                var funcionarios = await ObterFuncionariosDaCache();
 
-                if (alocacao == null)
-                    return Json(new { sucesso = false, mensagem = "Alocação não encontrada." });
+                var alocacaoExisteNaCache = funcionarios
+                    .OfType<Formador>()
+                    .Where(f => f.Alocacoes != null)
+                    .SelectMany(f => f.Alocacoes)
+                    .FirstOrDefault(a => a.Id == id);
 
-                _context.Alocacoes.Remove(alocacao);
+                if (alocacaoExisteNaCache == null)
+                {
+                    return Json(new { sucesso = false, mensagem = "Formação não encontrada." });
+                }
+
+                var alocacaoParaApagar = new Alocacao { Id = id };
+
+                _context.Alocacoes.Remove(alocacaoParaApagar);
                 await _context.SaveChangesAsync();
+
+                _cache.Remove(CacheKeys.ListaFuncionarios);
 
                 return Json(new { sucesso = true, mensagem = "Alocação eliminada com sucesso." });
             }
@@ -44,6 +63,17 @@ namespace ADOSMELHORES.Controllers
             {
                 return Json(new { sucesso = false, mensagem = "Erro ao eliminar alocação: " + ex.Message });
             }
+        }
+        private async Task<List<Funcionario>> ObterFuncionariosDaCache()
+        {
+            if (!_cache.TryGetValue(CacheKeys.ListaFuncionarios, out List<Funcionario> funcionarios))
+            {
+                funcionarios = await _context.Funcionarios.Include("Alocacoes").ToListAsync();
+
+                _cache.Set(CacheKeys.ListaFuncionarios, funcionarios);
+            }
+
+            return funcionarios;
         }
     }
 }
