@@ -35,25 +35,20 @@ namespace ADOSMELHORES.Controllers
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
             var alocacao = await _context.Alocacoes.FindAsync(id);
-            if (alocacao != null)
+
+            if (alocacao == null)
             {
-            try { 
+                return Json(new { sucesso = false, mensagem = "Formação não encontrada na base de dados." });
+            }
+
+            try
+            {
                 var funcionarios = await ObterFuncionariosDaCache();
-
-                var alocacaoExisteNaCache = funcionarios
+                var existeNaCache = funcionarios
                     .OfType<Formador>()
-                    .Where(f => f.Alocacoes != null)
-                    .SelectMany(f => f.Alocacoes)
-                    .FirstOrDefault(a => a.Id == id);
+                    .Any(f => f.Alocacoes != null && f.Alocacoes.Any(a => a.Id == id));
 
-                if (alocacaoExisteNaCache == null)
-                {
-                    return Json(new { sucesso = false, mensagem = "Formação não encontrada." });
-                }
-
-                var alocacaoParaApagar = new Alocacao { Id = id };
-
-                _context.Alocacoes.Remove(alocacaoParaApagar);
+                _context.Alocacoes.Remove(alocacao);
                 await _context.SaveChangesAsync();
 
                 _cache.Remove(CacheKeys.ListaFuncionarios);
@@ -64,9 +59,6 @@ namespace ADOSMELHORES.Controllers
             {
                 return Json(new { sucesso = false, mensagem = "Erro ao eliminar alocação: " + ex.Message });
             }
-        }
-
-            return Json(new { sucesso = false, mensagem = "Não encontrada" });
         }
         private async Task<List<Funcionario>> ObterFuncionariosDaCache()
         {
