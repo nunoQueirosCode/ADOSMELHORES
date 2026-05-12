@@ -52,18 +52,8 @@
                     </a>
                 </li>
                 <li>
-                    <a class="sidebar-link" asp-area="" asp-controller="Alocacao" asp-action="Index">
-                        <i class="fa-solid fa-graduation-cap"></i> Formações
-                    </a>
-                </li>
-                <li>
-                    <a class="sidebar-link" asp-area="" asp-controller="Relatorios" asp-action="Index">
-                        <i class="fa-solid fa-file-invoice"></i> Relatórios
-                    </a>
-                </li>
-                <li>
-                    <a class="sidebar-link" asp-area="" asp-controller="Configuracoes" asp-action="Index">
-                        <i class="fa-solid fa-gear"></i> Configurações
+                    <a class="sidebar-link @(currentController == "Alocacao" ? "active" : "") " asp-area="" asp-controller="Alocacao" asp-action="Index">
+                        <i class="fa-solid fa-book-open"></i> Formações
                     </a>
                 </li>
             </ul>
