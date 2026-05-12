@@ -239,7 +239,6 @@ namespace ADOSMELHORES.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Guid id, FuncionarioViewModel model)
         {
-            // Segurança: Garantir que o ID do URL é igual ao ID do formulário escondido
             if (id != model.Id) return NotFound();
 
             if (ModelState.IsValid)
@@ -290,7 +289,6 @@ namespace ADOSMELHORES.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    // Tratamento de erro caso o registo tenha sido apagado entretanto
                     if (!funcionarios.Any(e => e.Id == id))
                         return NotFound();
                     else
@@ -418,7 +416,6 @@ namespace ADOSMELHORES.Controllers
 
                 _cache.Remove(CacheKeys.ListaFuncionarios);
 
-               
                 return Json(new { sucesso = true });
             }
             catch (Exception ex)
