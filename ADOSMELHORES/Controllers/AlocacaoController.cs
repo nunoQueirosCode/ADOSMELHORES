@@ -31,11 +31,11 @@ namespace ADOSMELHORES.Controllers
             return View(alocacoes);
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(Guid id)
+        [HttpPost, ActionName("Delete")]
+        public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
-            try
+            var alocacao = await _context.Alocacoes.FindAsync(id);
+            if (alocacao != null)
             {
                 var funcionarios = await ObterFuncionariosDaCache();
 
@@ -63,6 +63,8 @@ namespace ADOSMELHORES.Controllers
             {
                 return Json(new { sucesso = false, mensagem = "Erro ao eliminar alocação: " + ex.Message });
             }
+
+            return Json(new { sucesso = false, mensagem = "Não encontrada" });
         }
         private async Task<List<Funcionario>> ObterFuncionariosDaCache()
         {
