@@ -1,4 +1,10 @@
-﻿<!DOCTYPE html>
+﻿@{
+    var dataSistemaStr = Context.Request.Cookies["DataSistema"];
+    DateTime dataReferencia = DateTime.TryParse(dataSistemaStr, out DateTime dt) ? dt : DateTime.Today;
+    string dataCookie = dataReferencia.ToString("dd/MM/yyyy");
+}
+
+<!DOCTYPE html>
 <html lang="pt-PT">
 <head>
     <meta charset="utf-8" />
@@ -46,11 +52,6 @@
                     </a>
                 </li>
                 <li>
-                    <a class="sidebar-link" asp-area="" asp-controller="Ativos" asp-action="Index">
-                        <i class="fa-solid fa-laptop"></i> Gestão de Ativos
-                    </a>
-                </li>
-                <li>
                     <a class="sidebar-link" asp-area="" asp-controller="Formacoes" asp-action="Index">
                         <i class="fa-solid fa-graduation-cap"></i> Formações
                     </a>
@@ -74,12 +75,12 @@
             <!-- CABEÇALHO DO TOPO -->
             <header class="top-header">
                 <div class="d-flex align-items-center">
-                    <span class="text-muted me-3">
-                        <i class="fa-solid fa-user-circle me-1" style="color: var(--azul-conhecimento);"></i>
-                        Administrador
-                    </span>
+                    <div class="text-end">
+                        <span class="text-muted small d-block">Data do Sistema</span>
+                        <strong style="color: var(--preto);">@dataCookie</strong>
+                    </div>
                     <button class="btn btn-ados btn-sm" type="button">
-                        <i class="fa-solid fa-right-from-bracket"></i> Sair
+                        <i class="fa-solid fa-right-from-bracket"></i> ..
                     </button>
                 </div>
             </header>
