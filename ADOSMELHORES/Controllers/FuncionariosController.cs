@@ -364,7 +364,6 @@ namespace ADOSMELHORES.Controllers
 
             _cache.Remove(CacheKeys.ListaFuncionarios);
 
-            return RedirectToAction(nameof(Details), new { id = id});
             return RedirectToAction(nameof(Details), new { id = idFormador });
         }
 
@@ -419,7 +418,7 @@ namespace ADOSMELHORES.Controllers
 
                 _cache.Remove(CacheKeys.ListaFuncionarios);
 
-                return RedirectToAction(nameof(Details), new { id = coordenadorId });
+               
                 return Json(new { sucesso = true });
             }
             catch (Exception ex)
