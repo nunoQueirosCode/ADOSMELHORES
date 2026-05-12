@@ -18,36 +18,32 @@ namespace ADOSMELHORES.Controllers
         {
             var alocacoes = await _context.Alocacoes
                 .Include(a => a.Formador)
-                .Include(a => a.DataInicio)
                 .ToListAsync();
 
 
             return View(alocacoes);
         }
 
-        public async Task<IActionResult> Details (Guid? id)
-        {
-           if (id == null) return NotFound();
-            var alocacao = await _context.Alocacoes
-                .Include(a => a.Formador)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (alocacao == null) return NotFound();
-            return View(alocacao);
-        }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var alocacao = await _context.Alocacoes.FindAsync(id);
-            if (alocacao != null)
+            try
             {
+                var alocacao = await _context.Alocacoes.FindAsync(id);
+
+                if (alocacao == null)
+                    return Json(new { sucesso = false, mensagem = "Alocação não encontrada." });
+
                 _context.Alocacoes.Remove(alocacao);
                 await _context.SaveChangesAsync();
+
+                return Json(new { sucesso = true, mensagem = "Alocação eliminada com sucesso." });
             }
-            return RedirectToAction(nameof(Index));
+            catch (Exception ex)
+            {
+                return Json(new { sucesso = false, mensagem = "Erro ao eliminar alocação: " + ex.Message });
+            }
         }
-
-
     }
 }
