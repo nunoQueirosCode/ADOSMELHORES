@@ -144,6 +144,13 @@ namespace ADOSMELHORES.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateRegistoCriminal(Guid id, DateTime novaDataRegisto)
         {
+            DateTime dataAtualSistema = ObterDataDoSistema();
+
+            if (novaDataRegisto <= dataAtualSistema)
+            {
+                return Json(new { sucesso = false, mensagem = "A nova data de registo criminal não pode ser inferior à data atual do sistema." });
+            }
+
             var funcionarios = await ObterFuncionariosDaCache();
 
             var funcionario = funcionarios.FirstOrDefault(a => a.Id == id);
@@ -164,6 +171,13 @@ namespace ADOSMELHORES.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateContrato(Guid id, DateTime novaDataContrato)
         {
+            DateTime dataAtualSistema = ObterDataDoSistema();
+
+            if (novaDataContrato <= dataAtualSistema)
+            {
+                return Json(new { sucesso = false, mensagem = "A nova data de fim de contrato não pode ser inferior à data atual do sistema." });
+            }
+
             var funcionarios = await ObterFuncionariosDaCache();
 
             var funcionario = funcionarios.FirstOrDefault(a => a.Id == id);
@@ -343,9 +357,16 @@ namespace ADOSMELHORES.Controllers
         [HttpPost]
         public async Task<IActionResult> AlocacaoFuncionario(Guid idFormador, DateTime dataInicio, DateTime dataFim, string descricao)
         {
+            DateTime dataAtualSistema = ObterDataDoSistema();
+
             if (dataFim < dataInicio)
             {
                 return Json(new { sucesso = false, mensagem = "A Data de Fim não pode ser anterior à Data de Início." });
+            }
+
+            if (dataInicio < dataAtualSistema)
+            {
+                return Json(new { sucesso = false, mensagem = "A Data de Início não pode ser inferior à data atual do sistema." });
             }
 
             var novaAlocacao = new Alocacao
@@ -502,5 +523,26 @@ namespace ADOSMELHORES.Controllers
 
             return funcionarios;
         }
+        protected DateTime ObterDataDoSistema()
+        {
+            string dataCookie = Request.Cookies["DataSistema"];
+            DateTime dataAtualDoSistema;
+
+            if (string.IsNullOrEmpty(dataCookie) || !DateTime.TryParse(dataCookie, out dataAtualDoSistema))
+            {
+                dataAtualDoSistema = DateTime.Today;
+
+                CookieOptions options = new CookieOptions
+                {
+                    Expires = DateTime.Now.AddMinutes(30),
+                    HttpOnly = true
+                };
+
+                Response.Cookies.Append("DataSistema", dataAtualDoSistema.ToString("yyyy-MM-dd"), options);
+            }
+
+            return dataAtualDoSistema;
+        }
+
     }
 }
