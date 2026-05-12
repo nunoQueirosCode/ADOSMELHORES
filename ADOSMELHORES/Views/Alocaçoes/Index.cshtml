@@ -1,0 +1,104 @@
+﻿@model IEnumerable<ADOSMELHORES.Data.Empresa.Alocacao>
+@{
+    ViewData["Title"] = "Alocações";
+}
+
+@Html.AntiForgeryToken()
+
+@section Styles {
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 style="color: var(--azul-conhecimento); font-weight: 700; margin-bottom: 0;">Alocações</h2>
+        <span class="text-muted">Consulte as formações alocadas aos formadores</span>
+    </div>
+</div>
+
+<div class="card card-ados">
+    <div class="card-body p-4">
+        <div class="table-responsive">
+            <table id="tabelaAlocacoes" class="table table-hover align-middle" style="width:100%">
+                <thead style="border-bottom: 2px solid var(--ciano-evolucao); color: var(--azul-conhecimento);">
+                    <tr>
+                        <th>Formador</th>
+                        <th>Descrição</th>
+                        <th>Data Início</th>
+                        <th>Data Fim</th>
+                        <th>Valor Hora</th>
+                        <th class="text-end">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var alocacao in Model)
+                    {
+                        <tr>
+                            <td>
+                                <div class="fw-bold text-dark">
+                                    @(alocacao.Formador?.Nome ?? "Formador removido")
+                                </div>
+                            </td>
+                            <td>@alocacao.DescricaoFormacao</td>
+                            <td>@alocacao.DataInicio.ToString("dd/MM/yyyy")</td>
+                            <td>@alocacao.DataFim.ToString("dd/MM/yyyy")</td>
+                            <td>@alocacao.ValorHoraNoMomento.ToString("C")</td>
+                            <td class="text-end">
+                                <button type="button" class="btn btn-sm btn-light text-danger"
+                                        title="Eliminar"
+                                        onclick="eliminarAlocacao('@alocacao.Id')">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#tabelaAlocacoes').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/pt-PT.json',
+                },
+                dom: "<'row mb-3'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
+                     "<'row'<'col-sm-12'tr>>" +
+                     "<'row mt-3'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+                columnDefs: [
+                    { orderable: false, targets: 5 }
+                ],
+                order: [[2, 'desc']],
+                pageLength: 10,
+                lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Todos"]]
+            });
+        });
+
+        function eliminarAlocacao(id) {
+            if (confirm('Tem a certeza que quer eliminar esta alocação?')) {
+                $.ajax({
+                    url: '/Alocacao/Delete/' + id,
+                    type: 'POST',
+                    headers: {
+                        'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                    },
+                    success: function (response) {
+                        if (response.sucesso) {
+                            location.reload();
+                        } else {
+                            alert(response.mensagem);
+                        }
+                    },
+                    error: function () {
+                        alert('Erro ao eliminar a alocação.');
+                    }
+                });
+            }
+        }
+    </script>
+}
