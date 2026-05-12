@@ -3,6 +3,7 @@
     public class ItemAlocacaoViewModel
     {
         public Guid AlocacaoId { get; set; }
+        public string Descricao { get; set; } = string.Empty;
         public string NomeFuncionario { get; set; } = string.Empty;
         public DateTime DataInicio { get; set; }
         public DateTime DataFim { get; set; }
