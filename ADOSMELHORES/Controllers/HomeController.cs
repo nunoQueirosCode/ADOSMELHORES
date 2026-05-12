@@ -5,6 +5,7 @@ using ADOSMELHORES.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using System.Diagnostics;
 using System.Text;
 
@@ -13,10 +14,12 @@ namespace ADOSMELHORES.Controllers
     public class HomeController : Controller
     {
         private readonly EmpresaContext _context;
+        private readonly IMemoryCache _cache;
 
-        public HomeController(EmpresaContext context)
+        public HomeController(EmpresaContext context, IMemoryCache cache)
         {
             _context = context;
+            _cache = cache;
         }
 
         public async Task<IActionResult> Index()
@@ -37,7 +40,7 @@ namespace ADOSMELHORES.Controllers
             ViewBag.DataSistema = dataAtualDoSistema.ToString("yyyy-MM-dd");
             ViewBag.DataSistemaFormatada = dataAtualDoSistema.ToString("dd 'de' MMMM, yyyy");
 
-            var funcionarios = await _context.Funcionarios.Include("Alocacoes").ToListAsync();
+            var funcionarios = await ObterFuncionariosDaCache();
 
             var model = new HomeIndexViewModel();
 
@@ -124,7 +127,7 @@ namespace ADOSMELHORES.Controllers
             {
                 dataAtualDoSistema = DateTime.Parse(dataCookie);
             }
-            var funcionarios = await _context.Funcionarios.Include("Alocacoes").ToListAsync();
+            var funcionarios = await ObterFuncionariosDaCache();
 
             var model = new HomeDashboardViewModel();
 
@@ -142,7 +145,8 @@ namespace ADOSMELHORES.Controllers
                            return ContarDiasUteis(dataCalculoInicio, dataCalculoFim) * 6 * f.ValorHora;
                            }) ?? 0);
 
-                        model.TotalGeral = model.TotalDiretores + model.TotalSecretarias + model.TotalCoordenadores + model.TotalFormadores;
+            model.TotalGeral = model.TotalDiretores + model.TotalSecretarias + model.TotalCoordenadores + model.TotalFormadores;
+
             model.QtdFuncionarios = funcionarios.Count;
 
             return View(model);
@@ -238,6 +242,21 @@ namespace ADOSMELHORES.Controllers
 
             var conteudo = Encoding.UTF8.GetBytes(csv.ToString());
             return File(conteudo, "text/csv", $"Funcionarios_{DateTime.Now:yyyyMMdd_HHmmss}.csv");
+        }
+        private async Task<List<Funcionario>> ObterFuncionariosDaCache()
+        {
+            // Pergunta à cache: "Tens a ListaFuncionariosCache guardada?"
+            if (!_cache.TryGetValue(CacheKeys.ListaFuncionarios, out List<Funcionario> funcionarios))
+            {
+                // Se não tem, vamos à Base de Dados. 
+                // E trazemos TUDO o que os vários controllers precisam, incluindo as Alocações.
+                funcionarios = await _context.Funcionarios.Include("Alocacoes").ToListAsync();
+
+                // Guardamos no pote para os próximos pedidos (do Home ou do FuncionariosController)
+                _cache.Set(CacheKeys.ListaFuncionarios, funcionarios);
+            }
+
+            return funcionarios;
         }
     }
 }
