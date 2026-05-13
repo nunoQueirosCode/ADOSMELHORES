@@ -44,13 +44,17 @@ namespace ADOSMELHORES.Controllers
         {
             var model = new FuncionarioViewModel();
 
+            DateTime dataAtualSistema = ObterDataDoSistema();
+
             var funcionarios = await ObterFuncionariosDaCache();
 
             model.ListaDiretores = funcionarios.OfType<Diretor>()
+                .Where(d => d.DataFimContrato > dataAtualSistema)
                 .Select(d => new SelectListItem { Value = d.Id.ToString(), Text = d.Nome })
                 .ToList();
 
             model.ListaCoordenadores = funcionarios.OfType<Coordenador>()
+                .Where(c => c.DataFimContrato > dataAtualSistema)
                 .Select(c => new SelectListItem { Value = c.Id.ToString(), Text = c.Nome })
                 .ToList();
 
@@ -81,7 +85,7 @@ namespace ADOSMELHORES.Controllers
                         {
                             Salario = model.Salario,
                             Area = model.Area,
-                            DiretorId = (Guid)model.DiretorId
+                            DiretorId = model.DiretorId == null ? null : model.DiretorId
                         };
                         break;
                     case "Formador":
@@ -122,11 +126,15 @@ namespace ADOSMELHORES.Controllers
 
             var funcionarios = await ObterFuncionariosDaCache();
 
+            DateTime dataAtualSistema = ObterDataDoSistema();
+
             model.ListaDiretores = funcionarios.OfType<Diretor>()
-                .Select(d => new SelectListItem { Value = d.Id.ToString(), Text = d.Nome })
-                .ToList();
+               .Where(d => d.DataFimContrato > dataAtualSistema)
+               .Select(d => new SelectListItem { Value = d.Id.ToString(), Text = d.Nome })
+               .ToList();
 
             model.ListaCoordenadores = funcionarios.OfType<Coordenador>()
+                .Where(c => c.DataFimContrato > dataAtualSistema)
                 .Select(c => new SelectListItem { Value = c.Id.ToString(), Text = c.Nome })
                 .ToList();
 
@@ -196,6 +204,8 @@ namespace ADOSMELHORES.Controllers
 
             var funcionario = funcionarios.FirstOrDefault(a => a.Id == id);
 
+            DateTime dataAtualSistema = ObterDataDoSistema();
+
             if (funcionario == null) return NotFound();
 
             var model = new FuncionarioViewModel
@@ -206,8 +216,8 @@ namespace ADOSMELHORES.Controllers
                 Contacto = funcionario.Contacto,
                 DataFimContrato = funcionario.DataFimContrato,
                 DataRegistoCriminal = funcionario.DataRegistoCriminal,
-                ListaDiretores = _context.Diretores.Select(d => new SelectListItem { Value = d.Id.ToString(), Text = d.Nome }).ToList(),
-                ListaCoordenadores = _context.Coordenadores.Select(c => new SelectListItem { Value = c.Id.ToString(), Text = c.Nome }).ToList()
+                ListaDiretores = funcionarios.OfType<Diretor>().Where(d => d.DataFimContrato > dataAtualSistema).Select(d => new SelectListItem { Value = d.Id.ToString(), Text = d.Nome }).ToList(),
+                ListaCoordenadores = funcionarios.OfType<Coordenador>().Where(d => d.DataFimContrato > dataAtualSistema).Select(c => new SelectListItem { Value = c.Id.ToString(), Text = c.Nome }).ToList()
             };
 
             if (funcionario is Diretor diretor)
@@ -272,7 +282,7 @@ namespace ADOSMELHORES.Controllers
                 else if (funcionarioExistente is Secretaria secretaria)
                 {
                     secretaria.Area = model.Area;
-                    secretaria.DiretorId = (Guid)model.DiretorId;
+                    secretaria.DiretorId = model.DiretorId == null ? null : model.DiretorId;
                     secretaria.Salario = model.Salario;
                 }
                 else if (funcionarioExistente is Formador formador)
@@ -306,8 +316,10 @@ namespace ADOSMELHORES.Controllers
             }
             var listaFuncionarios = await ObterFuncionariosDaCache();
 
-            model.ListaDiretores = listaFuncionarios.OfType<Diretor>().Select(d => new SelectListItem { Value = d.Id.ToString(), Text = d.Nome }).ToList();
-            model.ListaCoordenadores = listaFuncionarios.OfType<Coordenador>().Select(c => new SelectListItem { Value = c.Id.ToString(), Text = c.Nome }).ToList();
+            DateTime dataAtualSistema = ObterDataDoSistema();
+
+            model.ListaDiretores = listaFuncionarios.OfType<Diretor>().Where(d => d.DataFimContrato > dataAtualSistema).Select(d => new SelectListItem { Value = d.Id.ToString(), Text = d.Nome }).ToList();
+            model.ListaCoordenadores = listaFuncionarios.OfType<Coordenador>().Where(d => d.DataFimContrato > dataAtualSistema).Select(c => new SelectListItem { Value = c.Id.ToString(), Text = c.Nome }).ToList();
 
             return View(model);
         }
@@ -352,7 +364,7 @@ namespace ADOSMELHORES.Controllers
         {
             DateTime dataAtualSistema = ObterDataDoSistema();
 
-            if (dataFim < dataInicio)
+            if (dataFim <= dataInicio)
             {
                 return Json(new { sucesso = false, mensagem = "A Data de Fim não pode ser anterior à Data de Início." });
             }
