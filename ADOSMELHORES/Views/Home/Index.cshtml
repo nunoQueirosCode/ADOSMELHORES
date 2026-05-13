@@ -95,6 +95,10 @@
             <div class="card-body d-flex justify-content-center align-items-center">
                 <canvas id="graficoCargos" style="max-height: 250px;"></canvas>
             </div>
+            <div class="text-center text-muted mb-2" style="font-size: 0.85rem;">
+                <i class="fa-solid fa-circle-info me-1"></i>
+                Distribuição do gasto salarial e de honorários por tipo de funcionário.
+            </div>
         </div>
     </div>
 
@@ -136,7 +140,6 @@
                                         </td>
                                     </tr>
                                 }
-                            }
                         </tbody>
                     </table>
                 </div>
@@ -190,6 +193,9 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     cutout: '70%',
+                    layout:{
+                        padding: 15
+                    },
                     plugins: {
                         legend: {
                             position: 'right',
