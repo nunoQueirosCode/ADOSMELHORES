@@ -54,13 +54,15 @@ namespace ADOSMELHORES.Controllers
         {
             var funcionarios = await _context.Funcionarios.ToListAsync();
 
+            DateTime dataAtualSistema = ObterDataDoSistema();
+
             if (!funcionarios.Any())
             {
                 return BadRequest("Não há funcionários para exportar.");
             }
 
             var csv = new StringBuilder();
-            
+
             // Cabeçalho do CSV
             csv.AppendLine("Id,Nome,Morada,Contacto,Tipo,DataFimContrato,DataRegistoCriminal,Salario,Area,AreaLecionada,ValorHora,IsencaoHorario,BonusMensal,CarroEmpresa,TipoDisponibilidade,DiretorId,CoordenadorId");
 
@@ -114,7 +116,7 @@ namespace ADOSMELHORES.Controllers
             }
 
             var conteudo = Encoding.UTF8.GetBytes(csv.ToString());
-            return File(conteudo, "text/csv", $"Funcionarios_{DateTime.Now:yyyyMMdd_HHmmss}.csv");
+            return File(conteudo, "text/csv", $"Funcionarios_{dataAtualSistema:yyyyMMdd_HHmmss}.csv");
         }
     }
 }
