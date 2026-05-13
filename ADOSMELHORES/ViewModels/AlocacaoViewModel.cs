@@ -1,27 +1,19 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ADOSMELHORES.Data.Empresa
+namespace ADOSMELHORES.ViewModels
 {
-    public class Alocacao
+    public class AlocacaoViewModel
     {
-        [Key]
         public Guid Id { get; set; }
 
-        public Guid? FormadorId { get; set; }
-        public Formador? Formador { get; set; }
-
-        public decimal ValorHoraNoMomento { get; set; } // Importante para histórico de preços
-
-        [Required]
+        public string NomeFormador { get; set; } = string.Empty;
+        [Required (ErrorMessage = "Campo obrigatório.")]
         public string DescricaoFormacao { get; set; } = string.Empty;
 
-        [Required]
         [DataType(DataType.Date)]
         public DateTime DataInicio { get; set; }
 
-        [Required]
         [DataType(DataType.Date)]
         public DateTime DataFim { get; set; }
-
     }
 }

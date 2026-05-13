@@ -3,6 +3,7 @@
     public class ItemAlocacaoViewModel
     {
         public Guid AlocacaoId { get; set; }
+        public string Descricao { get; set; } = string.Empty;
         public string NomeFuncionario { get; set; } = string.Empty;
         public DateTime DataInicio { get; set; }
         public DateTime DataFim { get; set; }
@@ -14,10 +15,16 @@
         public int QtdFuncionariosContratos { get; set; }
         public int QtdFuncionariosRegistoCriminal { get; set; }
         public int QtdDiretores { get; set; }
-
+        public decimal TotalDiretores { get; set; }
         public int QtdCoordenadores { get; set; }
+        public decimal TotalCoordenadores { get; set; }
         public int QtdSecretarias { get; set; }
+        public decimal TotalSecretarias { get; set; }
+
         public int QtdFormadores { get; set; }
+
+        public decimal TotalFormadores { get; set; }
+
         public List<ItemAlocacaoViewModel>? TabelaAlocacoes { get; set; }
 
     }

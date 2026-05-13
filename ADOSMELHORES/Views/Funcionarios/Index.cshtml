@@ -1,6 +1,25 @@
-﻿
+﻿@model IEnumerable<ADOSMELHORES.Data.Empresa.Funcionario>
 @{
     ViewData["Title"] = "Gestão de Funcionários";
+    var dataSistemaStr = Context.Request.Cookies["DataSistema"];
+    DateTime dataReferencia = DateTime.TryParse(dataSistemaStr, out DateTime dt) ? dt : DateTime.Today;
+}
+@functions {
+    public string ObterIniciais(string nome)
+    {
+        if (string.IsNullOrWhiteSpace(nome))
+            return "";
+
+        var palavras = nome.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+        if (palavras.Length == 1)
+            return palavras[0].Substring(0, 1).ToUpper();
+
+        string primeiraLetra = palavras[0].Substring(0, 1);
+        string ultimaLetra = palavras[palavras.Length - 1].Substring(0, 1);
+
+        return (primeiraLetra + ultimaLetra).ToUpper();
+    }
 }
 
 @section Styles {
@@ -27,10 +46,16 @@
         <h2 style="color: var(--azul-conhecimento); font-weight: 700; margin-bottom: 0;">Funcionários</h2>
         <span class="text-muted">Gere a equipa e formadores da empresa</span>
     </div>
-    <a asp-action="Create" class="btn btn-ados">
-        <i class="fa-solid fa-user-plus me-2"></i>Novo Funcionário
-    </a>
+    <div>
+        <a asp-action="Create" class="btn btn-ados">
+            <i class="fa-solid fa-user-plus me-2"></i>Novo Funcionário
+        </a>
+        <a asp-action="ExportarCSV" asp-controller="Home" class="btn btn-success shadow-sm fw-bold">
+                <i class="fa-solid fa-file-csv me-2"></i>Exportar Dados
+         </a>
+     </div>
 </div>
+
 
 <div class="card card-ados">
     <div class="card-body p-4">
@@ -45,54 +70,44 @@
                     </tr>
                 </thead>
                 <tbody>
-                   
-                    <tr>
-                        <td>
-                            <div class="d-flex align-items-center">
-                                <div class="bg-light rounded-circle d-flex justify-content-center align-items-center me-3" style="width: 40px; height: 40px; color: var(--azul-conhecimento);">
-                                    <strong>JM</strong>
-                                </div>
-                                <div>
-                                    <div class="fw-bold text-dark">João Marques</div>
-                                    <div class="text-muted small">
-                                        <span class="badge bg-warning bg-opacity-10 text-warning border border-warning">Data de Contrato</span>
+                    @foreach (var funcionario in Model)
+                    {
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-light rounded-circle d-flex justify-content-center align-items-center me-3" style="width: 40px; height: 40px; color: var(--azul-conhecimento);">
+                                        <strong>@ObterIniciais(funcionario.Nome)</strong>
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold text-dark">
+                                            @funcionario.Nome
+                                        </div>
+                                        <div class="d-flex">
+                                            @if (funcionario.DataFimContrato >= dataReferencia && funcionario.DataFimContrato <= dataReferencia.AddDays(30))
+                                            {
+                                                <div class="text-muted small me-2">
+                                                    <span class="badge bg-warning  bg-opacity-10 text-warning border border-warning">Data de Contrato</span>
+                                                </div>
+                                            }
+                                            @if (funcionario.DataFimContrato >= dataReferencia && funcionario.DataRegistoCriminal <= dataReferencia.AddDays(30))
+                                            {
+                                                <div class="text-muted small">
+                                                    <span class="badge bg-danger bg-opacity-10 text-danger border border-danger">Registo Criminal</span>
+                                                </div>
+                                            }
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </td>
-                        <td>Formador Sénior</td>
-                        <td>+351 912 345 678</td>
-                        <td class="text-end">
-                            <a asp-action="Details" asp-route-id="qwerrwq" class="btn btn-sm btn-light text-info me-1" title="Detalhes">
-                                <i class="fa-solid fa-eye"></i>
-                            </a>
-                        </td>
-                    </tr>
-                    
-                    <tr>
-                        <td>
-                            <div class="d-flex align-items-center">
-                                <div class="bg-light rounded-circle d-flex justify-content-center align-items-center me-3" style="width: 40px; height: 40px; color: var(--azul-conhecimento);">
-                                    <strong>JM</strong>
-                                </div>
-                                <div>
-                                    <div class="fw-bold text-dark">João Marques</div> 
-                                    <div class="text-muted small">
-                                        <span class="badge bg-danger bg-opacity-10 text-danger border border-danger">Registo Criminal</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </td>
-                        <td>Formador Sénior</td>
-                        <td>+351 912 345 678</td>
-                        <td class="text-end">
-                            <a asp-action="Details" asp-route-id="asdfas" class="btn btn-sm btn-light text-info me-1" title="Detalhes">
-                                <i class="fa-solid fa-eye"></i>
-                            </a>
-                        </td>
-                    </tr>
-                    
-
+                            </td>
+                            <td>@(funcionario.GetType().Name == "Secretaria" ? "Secretária" : funcionario.GetType().Name)</td>
+                            <td>@funcionario.Contacto</td>
+                            <td class="text-end">
+                                <a asp-action="Details" asp-route-id="@funcionario.Id" class="btn btn-sm btn-light text-info me-1" title="Detalhes">
+                                    <i class="fa-solid fa-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
                 </tbody>
             </table>
         </div>

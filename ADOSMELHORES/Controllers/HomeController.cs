@@ -5,45 +5,30 @@ using ADOSMELHORES.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using System.Diagnostics;
 using System.Text;
 
 namespace ADOSMELHORES.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
-        private readonly EmpresaContext _context;
-
-        public HomeController(EmpresaContext context)
-        {
-            _context = context;
-        }
+        public HomeController(EmpresaContext context, IMemoryCache cache) : base(context, cache) { }
 
         public async Task<IActionResult> Index()
         {
-            string dataCookie = Request.Cookies["DataSistema"];
-            DateTime dataAtualDoSistema;
+            DateTime dataAtualDoSistema = ObterDataDoSistema();
 
-            if (string.IsNullOrEmpty(dataCookie))
-            {
-                dataAtualDoSistema = DateTime.Today;
-
-                Response.Cookies.Append("DataSistema", dataAtualDoSistema.ToString("yyyy-MM-dd"));
-            }
-            else
-            {
-                dataAtualDoSistema = DateTime.Parse(dataCookie);
-            }
-            ViewBag.DataSistema = dataAtualDoSistema.ToString("yyyy-MM-dd");
-            ViewBag.DataSistemaFormatada = dataAtualDoSistema.ToString("dd 'de' MMMM, yyyy");
-
-            var funcionarios = await _context.Funcionarios.Include("Alocacoes").ToListAsync();
+            var funcionarios = await ObterFuncionariosDaCache();
 
             var model = new HomeIndexViewModel();
 
-            decimal TotalDiretores = funcionarios.OfType<Diretor>().Sum(d => d.Salario + d.BonusMensal);
+            decimal TotalDiretores = funcionarios.OfType<Diretor>().Sum(d => d.Salario + (d.BonusMensal ?? 0));
+            model.TotalDiretores = TotalDiretores;
             decimal TotalSecretarias = funcionarios.OfType<Secretaria>().Sum(s => s.Salario);
+            model.TotalSecretarias = TotalSecretarias;
             decimal TotalCoordenadores = funcionarios.OfType<Coordenador>().Sum(c => c.Salario);
+            model.TotalCoordenadores = TotalCoordenadores;
 
             DateTime inicioDoMes = new DateTime(dataAtualDoSistema.Year, dataAtualDoSistema.Month, 1);
             DateTime fimDoMes = inicioDoMes.AddMonths(1).AddDays(-1);
@@ -55,6 +40,8 @@ namespace ADOSMELHORES.Controllers
                     DateTime dataCalculoFim = a.DataFim > fimDoMes ? fimDoMes : a.DataFim;
                     return ContarDiasUteis(dataCalculoInicio, dataCalculoFim) * 6 * f.ValorHora;
                 }) ?? 0);
+
+            model.TotalFormadores = TotalFormadores;    
 
             model.TotalGeral = TotalDiretores + TotalSecretarias + TotalCoordenadores + TotalFormadores;
 
@@ -79,6 +66,7 @@ namespace ADOSMELHORES.Controllers
                     .Select(x => new ItemAlocacaoViewModel
                     {
                         AlocacaoId = x.Alocacao.Id,
+                        Descricao = x.Alocacao.DescricaoFormacao,
                         NomeFuncionario = x.Funcionario.Nome, // Pegamos no nome do funcionário
                         DataInicio = x.Alocacao.DataInicio,
                         DataFim = x.Alocacao.DataFim
@@ -93,7 +81,7 @@ namespace ADOSMELHORES.Controllers
         {
             CookieOptions options = new CookieOptions
             {
-                Expires = DateTime.Now.AddDays(30),
+                Expires = DateTime.Now.AddMinutes(30),
                 HttpOnly = true
             };
 
@@ -102,33 +90,23 @@ namespace ADOSMELHORES.Controllers
             return RedirectToAction(nameof(Index)); 
         }
 
-        [HttpPost]
-        public IActionResult ResetarData()
+        public IActionResult ResetData()
         {
             Response.Cookies.Delete("DataSistema");
+
             return RedirectToAction(nameof(Index));
         }
 
         public async Task<IActionResult> CalcularDespesaMensal()
         {
-            string dataCookie = Request.Cookies["DataSistema"];
-            DateTime dataAtualDoSistema;
+   
+            DateTime dataAtualDoSistema = ObterDataDoSistema();
 
-            if (string.IsNullOrEmpty(dataCookie))
-            {
-                dataAtualDoSistema = DateTime.Today;
-
-                Response.Cookies.Append("DataSistema", dataAtualDoSistema.ToString("yyyy-MM-dd"));
-            }
-            else
-            {
-                dataAtualDoSistema = DateTime.Parse(dataCookie);
-            }
-            var funcionarios = await _context.Funcionarios.Include("Alocacoes").ToListAsync();
+            var funcionarios = await ObterFuncionariosDaCache();
 
             var model = new HomeDashboardViewModel();
 
-            model.TotalDiretores = funcionarios.OfType<Diretor>().Sum(d => d.Salario + d.BonusMensal);
+            model.TotalDiretores = funcionarios.OfType<Diretor>().Sum(d => d.Salario + (d.BonusMensal ?? 0));
             model.TotalSecretarias = funcionarios.OfType<Secretaria>().Sum(s => s.Salario);
             model.TotalCoordenadores = funcionarios.OfType<Coordenador>().Sum(c => c.Salario);
 
@@ -142,7 +120,8 @@ namespace ADOSMELHORES.Controllers
                            return ContarDiasUteis(dataCalculoInicio, dataCalculoFim) * 6 * f.ValorHora;
                            }) ?? 0);
 
-                        model.TotalGeral = model.TotalDiretores + model.TotalSecretarias + model.TotalCoordenadores + model.TotalFormadores;
+            model.TotalGeral = model.TotalDiretores + model.TotalSecretarias + model.TotalCoordenadores + model.TotalFormadores;
+
             model.QtdFuncionarios = funcionarios.Count;
 
             return View(model);
@@ -170,74 +149,6 @@ namespace ADOSMELHORES.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> ExportarCSV()
-        {
-            var funcionarios = await _context.Funcionarios.ToListAsync();
-
-            if (!funcionarios.Any())
-            {
-                return BadRequest("Não há funcionários para exportar.");
-            }
-
-            var csv = new StringBuilder();
-
-            // Cabeçalho do CSV
-            csv.AppendLine("Id,Nome,Morada,Contacto,Tipo,DataFimContrato,DataRegistoCriminal,Salario,Area,AreaLecionada,ValorHora,IsencaoHorario,BonusMensal,CarroEmpresa,TipoDisponibilidade,DiretorId,CoordenadorId");
-
-            // Linhas de dados
-            foreach (var funcionario in funcionarios)
-            {
-                var tipo = funcionario.GetType().Name;
-                var salario = "null";
-                var area = "null";
-                var areaLecionada = "null";
-                var valorHora = "null";
-                var isencaoHorario = "null";
-                var bonusMensal = "null";
-                var carroEmpresa = "null";
-                var tipoDisponibilidade = "null";
-                var diretorId = "null";
-                var coordenadorId = "null";
-
-                if (funcionario is Diretor d)
-                {
-                    salario = d.Salario.ToString("F2");
-                    isencaoHorario = d.IsencaoHorario.ToString();
-                    bonusMensal = d.BonusMensal.ToString("F2");
-                    carroEmpresa = d.CarroEmpresa.ToString();
-                }
-                else if (funcionario is Secretaria s)
-                {
-                    salario = s.Salario.ToString("F2");
-                    area = s.Area;
-                    diretorId = s.DiretorId.ToString() ?? "null";
-                }
-                else if (funcionario is Formador f)
-                {
-                    areaLecionada = f.AreaLecionada;
-                    valorHora = f.ValorHora.ToString("F2");
-                    tipoDisponibilidade = f.TipoDisponibilidade.ToString();
-                    coordenadorId = f.CoordenadorId?.ToString() ?? "null";
-                }
-                else if (funcionario is Coordenador c)
-                {
-                    salario = c.Salario.ToString("F2");
-                }
-
-                var linha = $"\"{funcionario.Id}\",\"{funcionario.Nome}\",\"{funcionario.Morada}\"," +
-                    $"\"{funcionario.Contacto}\",\"{tipo}\",\"{funcionario.DataFimContrato:yyyy-MM-dd}\"," +
-                    $"\"{funcionario.DataRegistoCriminal:yyyy-MM-dd}\",\"{salario}\",\"{area}\"," +
-                    $"\"{areaLecionada}\",\"{valorHora}\",\"{isencaoHorario}\",\"{bonusMensal}\"," +
-                    $"\"{carroEmpresa}\",\"{tipoDisponibilidade}\",\"{diretorId}\",\"{coordenadorId}\"";
-
-                csv.AppendLine(linha);
-            }
-
-            var conteudo = Encoding.UTF8.GetBytes(csv.ToString());
-            return File(conteudo, "text/csv", $"Funcionarios_{DateTime.Now:yyyyMMdd_HHmmss}.csv");
         }
     }
 }

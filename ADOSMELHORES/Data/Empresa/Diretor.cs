@@ -8,7 +8,7 @@ namespace ADOSMELHORES.Data.Empresa
 
         public decimal Salario { get; set; }
 
-        public decimal BonusMensal { get; set; }
+        public decimal? BonusMensal { get; set; }
 
         public bool CarroEmpresa { get; set; }
 

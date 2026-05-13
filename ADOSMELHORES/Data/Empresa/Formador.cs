@@ -7,11 +7,12 @@ namespace ADOSMELHORES.Data.Empresa
         public enum Disponibilidade
         {
             Laboral,
+            [Display(Name = "Pós-Laboral")]
             PosLaboral,
             Ambas
         }
 
-        public string AreaLecionada { get; set; } = string.Empty;
+        public string? AreaLecionada { get; set; } = string.Empty;
 
         public Disponibilidade TipoDisponibilidade { get; set; }
         
