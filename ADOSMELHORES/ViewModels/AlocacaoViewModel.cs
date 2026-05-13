@@ -7,7 +7,7 @@ namespace ADOSMELHORES.ViewModels
         public Guid Id { get; set; }
 
         public string NomeFormador { get; set; } = string.Empty;
-
+        [Required (ErrorMessage = "Campo obrigatório.")]
         public string DescricaoFormacao { get; set; } = string.Empty;
 
         [DataType(DataType.Date)]
