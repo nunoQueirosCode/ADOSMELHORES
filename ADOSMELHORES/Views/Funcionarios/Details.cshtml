@@ -370,9 +370,10 @@
             <div class="modal-content border-0 shadow-lg">
 
                 <!-- O formulário vai enviar a nova data para uma ação no teu Controller -->
-                <form asp-action="UpdateRegistoCriminal" method="post">
+                <form asp-action="UpdateRegistoCriminal" method="post" id="UpdateRegisto">
                     <!-- Input escondido com o ID do funcionário -->
                     <input type="hidden" name="id" value="@Model?.Id" />
+                    
 
                     <div class="modal-header bg-warning border-0">
                         <h5 class="modal-title fw-bold text-dark" id="modalRegistoCriminalLabel">
@@ -381,6 +382,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body p-4">
+                        <div id="erroRegisto" class="alert alert-warning d-none mb-3 text-center" role="alert"></div>
                         <p class="text-muted mb-3">Insira a nova data de validade do documento entregue pelo funcionário.</p>
                         <div class="mb-3">
                             <label for="NovaDataRegisto" class="form-label fw-bold">Nova Data de Validade:</label>
@@ -406,10 +408,10 @@
             <div class="modal-content border-0 shadow-lg">
 
                 <!-- O formulário vai enviar a nova data para uma ação no teu Controller -->
-                <form asp-action="UpdateContrato" method="post">
+                <form asp-action="UpdateContrato" method="post" id="UpdateContrato">
                     <!-- Input escondido com o ID do funcionário -->
                     <input type="hidden" name="id" value="@Model?.Id" />
-
+                    
                     <div class="modal-header bg-warning border-0">
                         <h5 class="modal-title fw-bold text-dark" id="modalContratoLabel">
                             <i class="fa-solid fa-calendar-check me-2"></i>Renovar Contrato
@@ -417,6 +419,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body p-4">
+                        <div id="erroContrato" class="alert alert-warning d-none mb-3 text-center" role="alert"></div>
                         <p class="text-muted mb-3">Insira a nova data de validade do documento entregue pelo funcionário.</p>
                         <div class="mb-3">
                             <label for="NovaDataRegisto" class="form-label fw-bold">Nova Data de Validade:</label>
@@ -733,24 +736,19 @@
                 var textoOriginal = btnSubmit.html();
                 var divErro = $('#erroAlocacao');
 
-                // 1. Limpa erros antigos e coloca o botão em "A guardar..."
                 divErro.addClass('d-none').text('');
                 btnSubmit.html('<i class="fa-solid fa-spinner fa-spin me-2"></i>A guardar...').prop('disabled', true);
 
-                // 2. Faz o pedido AJAX
+                
                 $.ajax({
-                    url: form.attr('action'), // Vai buscar o URL automaticamente ao 'asp-action'
+                    url: form.attr('action'), 
                     type: 'POST',
-                    data: form.serialize(), // O serialize() apanha magicamente todos os inputs e o Token de Segurança!
+                    data: form.serialize(), 
                     success: function (response) {
                         if (response.sucesso) {
-                            // SUCESSO!
-                            // Opcão mais simples: Recarregar a página para a nova formação aparecer na tabela
                             location.reload();
                         } else {
-                            // ERRO DO C#: Mostrar a mensagem de erro no Modal
                             divErro.text(response.mensagem).removeClass('d-none');
-                            // Restaura o botão para o utilizador poder tentar de novo
                             btnSubmit.html(textoOriginal).prop('disabled', false);
                         }
                     },
@@ -764,6 +762,69 @@
 
         });
         }
+        $(document).ready(function () {
+            $('#UpdateContrato').submit(function (e) {
+                    e.preventDefault();
+
+                    var form = $(this);
+                    var btnSubmit = form.find('button[type="submit"]');
+                    var textoOriginal = btnSubmit.html();
+                    var divErro = $('#erroContrato');
+
+                    divErro.addClass('d-none').text('');
+                    btnSubmit.html('<i class="fa-solid fa-spinner fa-spin me-2"></i>A guardar...').prop('disabled', true);
+
+                
+                    $.ajax({
+                        url: form.attr('action'),
+                        type: 'POST',
+                        data: form.serialize(),
+                        success: function (response) {
+                            if (response.sucesso) {
+                                location.reload();
+                            } else {
+                                divErro.text(response.mensagem).removeClass('d-none');
+                                btnSubmit.html(textoOriginal).prop('disabled', false);
+                            }
+                        },
+                        error: function () {
+                            divErro.text('Ocorreu um erro de comunicação com o servidor.').removeClass('d-none');
+                            btnSubmit.html(textoOriginal).prop('disabled', false);
+                        }
+                    });
+                });
+
+                $('#UpdateRegisto').submit(function (e) {
+                    e.preventDefault();
+
+                    var form = $(this);
+                    var btnSubmit = form.find('button[type="submit"]');
+                    var textoOriginal = btnSubmit.html();
+                    var divErro = $('#erroRegisto');
+
+                    divErro.addClass('d-none').text('');
+                    btnSubmit.html('<i class="fa-solid fa-spinner fa-spin me-2"></i>A guardar...').prop('disabled', true);
+
+                
+                    $.ajax({
+                        url: form.attr('action'),
+                        type: 'POST',
+                        data: form.serialize(),
+                        success: function (response) {
+                            if (response.sucesso) {
+                                location.reload();
+                            } else {
+                                divErro.text(response.mensagem).removeClass('d-none');
+                                btnSubmit.html(textoOriginal).prop('disabled', false);
+                            }
+                        },
+                        error: function () {
+                            divErro.text('Ocorreu um erro de comunicação com o servidor.').removeClass('d-none');
+                            btnSubmit.html(textoOriginal).prop('disabled', false);
+                        }
+                    });
+                });
+            });
     </script>
  
 }
