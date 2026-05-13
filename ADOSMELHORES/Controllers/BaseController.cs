@@ -116,7 +116,7 @@ namespace ADOSMELHORES.Controllers
             }
 
             var conteudo = Encoding.UTF8.GetBytes(csv.ToString());
-            return File(conteudo, "text/csv", $"Funcionarios_{dataAtualSistema:yyyyMMdd_HHmmss}.csv");
+            return File(conteudo, "text/csv", $"Funcionarios_{dataAtualSistema:yyyyMMdd}.csv");
         }
     }
 }
