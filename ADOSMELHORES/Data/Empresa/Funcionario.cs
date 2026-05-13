@@ -10,7 +10,7 @@ namespace ADOSMELHORES.Data.Empresa
         [Required]
         public string Nome { get; set; } = string.Empty;
 
-        public string Morada { get; set; } = string.Empty;
+        public string? Morada { get; set; } = string.Empty;
 
         [Phone]
         public string Contacto { get; set; } = string.Empty;

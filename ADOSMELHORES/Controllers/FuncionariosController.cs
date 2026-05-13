@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using static ADOSMELHORES.Data.Empresa.Formador;
 
@@ -363,6 +364,12 @@ namespace ADOSMELHORES.Controllers
         public async Task<IActionResult> AlocacaoFuncionario(Guid idFormador, DateTime dataInicio, DateTime dataFim, string descricao)
         {
             DateTime dataAtualSistema = ObterDataDoSistema();
+
+            if (descricao.IsNullOrEmpty())
+            {
+                return Json(new { sucesso = false, mensagem = "A descrição é obrigatória." });
+            }
+
 
             if (dataFim <= dataInicio)
             {

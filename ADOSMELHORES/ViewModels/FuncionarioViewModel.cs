@@ -14,7 +14,7 @@ namespace ADOSMELHORES.ViewModels
 
         [Required(ErrorMessage = "Tem que inserir o nome do funcionário.")]
         public string Nome { get; set; } = string.Empty;
-        public string Morada { get; set; } = string.Empty;
+        public string? Morada { get; set; } = string.Empty;
         public string Contacto { get; set; } = string.Empty;
         public decimal Salario { get; set; }
 
