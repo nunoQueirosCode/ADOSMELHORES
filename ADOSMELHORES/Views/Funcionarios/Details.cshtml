@@ -161,7 +161,7 @@
                         </div>
 
                         <div class="col-sm-6 mb-3">
-                            <span class="text-muted small text-uppercase fw-bold">Bónus Base</span>
+                            <span class="text-muted small text-uppercase fw-bold">Bónus Mensal (€)</span>
                             <p class="mb-0 text-dark">€@( (diretor.BonusMensal ?? 0).ToString("N0", new CultureInfo("pt-PT")) )</p>
                         </div>
 
@@ -508,7 +508,7 @@
                 
                 <form id="formCalcularVencimento">
                     <input type="hidden" id="calcFormadorId" value="@Model.Id" />
-
+                    <div id="erroVencimento" class="alert alert-warning d-none mb-3 text-center" role="alert"></div>
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label fw-bold small text-muted text-uppercase">Data Início</label>
@@ -546,9 +546,9 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow-lg">
             
-                <form asp-action="AlocacaoFuncionario" method="post">
+                <form asp-action="AlocacaoFuncionario" method="post" id="formAdicionarAlocacao">
                     <input type="hidden" name="idFormador" value="@Model.Id" />
-
+                    
                     <div class="modal-header bg-primary border-0">
                         <h5 class="modal-title fw-bold text-white" id="modalAdicionarAlocacaoLabel">
                             <i class="fa-solid fa-calendar-plus me-2"></i>Atribuir Nova Formação
@@ -557,9 +557,11 @@
                     </div>
                 
                     <div class="modal-body p-4">
+                        <div id="erroAlocacao" class="alert alert-warning d-none mb-3 text-center" role="alert">
+                        </div>
                         <div class="mb-3">
                             <label for="descricao" class="form-label fw-bold">Descrição da Formação:</label>
-                            <input type="text" class="form-control" id="descricao" name="descricao" required placeholder="Ex: Curso de ASP.NET Core">
+                            <input type="text" class="form-control" id="descricao" name="descricao" placeholder="Ex: Curso de ASP.NET Core">
                         </div>
                     
                         <div class="row">
@@ -675,7 +677,8 @@
                     var idFormador = $('#calcFormadorId').val();
                     var dataInicio = $('#calcDataInicio').val();
                     var dataFim = $('#calcDataFim').val();
-
+                    
+                    var divErro = $('#erroVencimento');
                     // 2. Colocar o botão em estado de "A carregar..." para dar feedback ao utilizador
                     var btn = $('#btnCalcular');
                     var textoOriginal = btn.html();
@@ -692,14 +695,15 @@
                         },
                         success: function (response) {
                             if (response.sucesso) {
+                                divErro.text(response.mensagem).addClass('d-none');
                                 // Se correu bem, injetamos os dados no HTML e mostramos a div
                                 $('#valorFinalDisplay').text(response.valorTotalFormatado);
                                 $('#detalhesCalculoDisplay').text(response.detalhesCalculo);
-                            
+                                
                                 // Animação suave para mostrar o resultado
                                 $('#resultadoCalculo').removeClass('d-none').hide().fadeIn();
                             } else {
-                                alert('Atenção: ' + response.mensagem);
+                                divErro.text(response.mensagem).removeClass('d-none');
                             }
                         },
                         error: function () {
@@ -718,7 +722,45 @@
                     $('#formCalcularVencimento')[0].reset();
                 });
 
+
+            $('#formAdicionarAlocacao').submit(function (e) {
+                e.preventDefault();
+
+                var form = $(this);
+                var btnSubmit = form.find('button[type="submit"]');
+                var textoOriginal = btnSubmit.html();
+                var divErro = $('#erroAlocacao');
+
+                // 1. Limpa erros antigos e coloca o botão em "A guardar..."
+                divErro.addClass('d-none').text('');
+                btnSubmit.html('<i class="fa-solid fa-spinner fa-spin me-2"></i>A guardar...').prop('disabled', true);
+
+                // 2. Faz o pedido AJAX
+                $.ajax({
+                    url: form.attr('action'), // Vai buscar o URL automaticamente ao 'asp-action'
+                    type: 'POST',
+                    data: form.serialize(), // O serialize() apanha magicamente todos os inputs e o Token de Segurança!
+                    success: function (response) {
+                        if (response.sucesso) {
+                            // SUCESSO!
+                            // Opcão mais simples: Recarregar a página para a nova formação aparecer na tabela
+                            location.reload();
+                        } else {
+                            // ERRO DO C#: Mostrar a mensagem de erro no Modal
+                            divErro.text(response.mensagem).removeClass('d-none');
+                            // Restaura o botão para o utilizador poder tentar de novo
+                            btnSubmit.html(textoOriginal).prop('disabled', false);
+                        }
+                    },
+                    error: function () {
+                        // ERRO DE REDE/SERVIDOR
+                        divErro.text('Ocorreu um erro de comunicação com o servidor.').removeClass('d-none');
+                        btnSubmit.html(textoOriginal).prop('disabled', false);
+                    }
+                });
             });
+
+        });
         }
     </script>
  
