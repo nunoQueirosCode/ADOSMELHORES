@@ -395,7 +395,7 @@ namespace ADOSMELHORES.Controllers
 
             _cache.Remove(CacheKeys.ListaFuncionarios);
 
-            return RedirectToAction(nameof(Details), new { id = idFormador });
+            return Json(new { sucesso = true });
         }
 
         [HttpPost]
