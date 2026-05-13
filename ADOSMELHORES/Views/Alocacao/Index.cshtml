@@ -1,0 +1,176 @@
+﻿@model IEnumerable<ADOSMELHORES.Data.Empresa.Alocacao>
+@{
+    ViewData["Title"] = "Alocações";
+}
+
+@Html.AntiForgeryToken()
+
+@section Styles {
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 style="color: var(--azul-conhecimento); font-weight: 700; margin-bottom: 0;">Formações</h2>
+        <span class="text-muted">Consulte as formações alocadas aos formadores</span>
+    </div>
+</div>
+
+<div class="card card-ados">
+    <div class="card-body p-4">
+        <div class="table-responsive">
+            <table id="tabelaAlocacoes" class="table table-hover align-middle" style="width:100%">
+                <thead style="border-bottom: 2px solid var(--ciano-evolucao); color: var(--azul-conhecimento);">
+                    <tr>
+                        <th>Descrição</th>
+                        <th>Formador</th>
+                        <th>Data Início</th>
+                        <th>Data Fim</th>
+                        <th class="text-end">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var alocacao in Model)
+                    {
+                        <tr>
+                            <td>
+                                <div class="fw-bold text-dark">
+                                    @alocacao.DescricaoFormacao
+                                </div>
+                            </td>
+                            <td>@(alocacao.Formador?.Nome ?? "Formador removido")</td>
+                            <td>@alocacao.DataInicio.ToString("dd/MM/yyyy")</td>
+                            <td>@alocacao.DataFim.ToString("dd/MM/yyyy")</td>
+                            <td class="text-end">
+                                <button class="btn btn-sm btn-light text-danger"
+                                        title="Remover da Equipa"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#modalRemoverAlocacao"
+                                        data-id="@alocacao.Id"
+                                        data-descricao="@alocacao.DescricaoFormacao">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!--Modal para confrimar remoção de formador da equipa-->
+<div class="modal fade" id="modalRemoverAlocacao" tabindex="-1" aria-labelledby="modalRemoverLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-danger text-white border-0">
+                <h5 class="modal-title fw-bold" id="modalRemoverLabel">
+                    <i class="fa-solid fa-link-slash me-2"></i>Remover Formação
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            <form id="formRemoverAlocaocao">
+                <input type="hidden" name="alocacaoId" id="alocacaoIdModal" value="" />
+
+                <div class="modal-body p-4 text-center">
+                    <i class="fa-solid fa-user-minus text-danger mb-3" style="font-size: 3rem;"></i>
+                    <h4>Tens a certeza?</h4>
+                    <p class="text-muted mb-0">Estás prestes a remover a formação <strong id="descricaoModal" class="text-dark"></strong>.</p>
+                </div>
+                
+                <div class="modal-footer border-0 bg-light justify-content-center">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">Sim, Remover Formação</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('#tabelaAlocacoes').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/pt-PT.json',
+                },
+                dom: "<'row mb-3'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
+                     "<'row'<'col-sm-12'tr>>" +
+                     "<'row mt-3'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+                columnDefs: [
+                    { orderable: false, targets: 4 }
+                ],
+                order: [[0, 'asc']],
+                pageLength: 10,
+                lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Todos"]]
+            });
+        });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            
+                var linhaParaRemover = null;
+
+                // 1. Quando o modal abre, preenchemos os dados E guardamos a linha
+                $('#modalRemoverAlocacao').on('show.bs.modal', function (event) {
+                
+                    var button = event.relatedTarget;
+                
+                    var alocacaoId = button.getAttribute('data-id');
+                    var alocaocaoDescr = button.getAttribute('data-descricao');
+                
+                    var modal = $(this);
+                    modal.find('#alocacaoIdModal').val(alocacaoId);
+                    modal.find('#descricaoModal').text(alocaocaoDescr);
+
+                    linhaParaRemover = $(button).closest('tr');
+                });
+
+                // 2. Quando o utilizador clica em "Sim, Remover"
+                $('#formRemoverAlocaocao').submit(function (e) {
+                    e.preventDefault(); // Impede o refresh da página
+
+                    var alocacaoId = $('#alocacaoIdModal').val();
+                
+                    var btnSubmit = $(this).find('button[type="submit"]');
+                    var textoOriginal = btnSubmit.html();
+                    btnSubmit.html('<i class="fa-solid fa-spinner fa-spin me-2"></i>A remover...').prop('disabled', true);
+
+                    // 3. Fazer o pedido AJAX
+                    $.ajax({
+                        url: '/Alocacao/Delete', 
+                        type: 'POST',
+                        data: {
+                            id: alocacaoId
+                        },
+                        success: function (response) {
+                            if (response.sucesso) {
+                            
+                                $('#modalRemoverAlocacao').modal('hide');
+
+                                if (linhaParaRemover) {
+                                    linhaParaRemover.css('background-color', '#fee2e2');
+                                    linhaParaRemover.fadeOut(600, function () {
+                                        $(this).remove();
+                                        
+                                    });
+                                }
+                            } 
+                        },
+                        error: function () {
+                            alert('Ocorreu um erro ao tentar comunicar com o servidor.');
+                        },
+                        complete: function () {
+                            btnSubmit.html(textoOriginal).prop('disabled', false);
+                        }
+                    });
+                }); 
+
+            }); 
+    </script>
+}

@@ -11,6 +11,7 @@ builder.Services.AddDbContext<EmpresaContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
+builder.Services.AddMemoryCache();
 
 var app = builder.Build();
 

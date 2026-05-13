@@ -1,8 +1,233 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model ADOSMELHORES.ViewModels.HomeIndexViewModel
+@{
+    ViewData["Title"] = "Dashboard Geral";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 style="color: var(--azul-conhecimento); font-weight: 700; margin-bottom: 0;">Visão Geral</h2>
+        <span class="text-muted">Resumo de Recursos Humanos da ADOSMELHORES</span>
+    </div>
+    
+    <div>
+        <a asp-action="ExportarCSV" asp-controller="Home" class="btn btn-success shadow-sm fw-bold">
+            <i class="fa-solid fa-file-csv me-2"></i>Exportar Dados
+        </a>
+    </div>
 </div>
+
+<div class="row g-4 mb-4">
+    
+    <div class="col-xl-3 col-md-6">
+        <div class="card card-ados h-100" style="border-left: 4px solid var(--azul-conhecimento);">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="text-muted text-uppercase small fw-bold mb-1">Total Funcionários</p>
+                        <h2 class="mb-0 fw-bold" style="color: var(--azul-conhecimento);">@Model.QtdFuncionarios </h2>
+                    </div>
+                    <div class="bg-light rounded-circle d-flex justify-content-center align-items-center" style="width: 50px; height: 50px; color: var(--azul-conhecimento); font-size: 1.5rem;">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="card card-ados h-100" style="border-left: 4px solid var(--ciano-evolucao);">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="text-muted text-uppercase small fw-bold mb-1">Despesa Salarial</p>
+                        <h2 class="mb-0 fw-bold" style="color: var(--azul-conhecimento);">@Model.TotalGeral €</h2>
+                    </div>
+                    <div class="bg-light rounded-circle d-flex justify-content-center align-items-center" style="width: 50px; height: 50px; color: var(--ciano-evolucao); font-size: 1.5rem;">
+                        <i class="fa-solid fa-euro-sign"></i>
+                    </div>
+                </div>
+                <div class="mt-3 text-muted small">
+                    Baseado nos contratos e formadores ativos
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="card card-ados h-100" style="border-left: 4px solid var(--dourado-excelencia);">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="text-muted text-uppercase small fw-bold mb-1">Contratos a Expirar</p>
+                        <h2 class="mb-0 fw-bold text-warning">@Model.QtdFuncionariosContratos</h2>
+                    </div>
+                    <div class="bg-warning bg-opacity-10 rounded-circle d-flex justify-content-center align-items-center" style="width: 50px; height: 50px; color: var(--dourado-excelencia); font-size: 1.5rem;">
+                        <i class="fa-solid fa-file-contract"></i>
+                    </div>
+                </div>
+                <div class="mt-3 text-muted small">
+                    <span class="text-warning"><i class="fa-solid fa-clock me-1"></i></span> Nos próximos 30 dias
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="card card-ados h-100" style="border-left: 4px solid #ef4444;">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="text-muted text-uppercase small fw-bold mb-1">Reg. Criminais Expirados</p>
+                        <h2 class="mb-0 fw-bold text-danger">@Model.QtdFuncionariosRegistoCriminal</h2>
+                    </div>
+                    <div class="bg-danger bg-opacity-10 rounded-circle d-flex justify-content-center align-items-center" style="width: 50px; height: 50px; color: #ef4444; font-size: 1.5rem;">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="row g-4 mb-4">
+    
+    <div class="col-lg-5">
+        <div class="card card-ados h-100">
+            <div class="card-header card-ados-header bg-white">
+                <i class="fa-solid fa-chart-pie me-2"></i>Distribuição por Cargo
+            </div>
+            <div class="card-body d-flex justify-content-center align-items-center">
+                <canvas id="graficoCargos" style="max-height: 250px;"></canvas>
+            </div>
+            <div class="text-center text-muted mb-2" style="font-size: 0.85rem;">
+                <i class="fa-solid fa-circle-info me-1"></i>
+                Distribuição do gasto salarial e de honorários por tipo de funcionário.
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-7">
+        <div class="card card-ados h-100">
+            <div class="card-header card-ados-header bg-white d-flex justify-content-between align-items-center">
+                <span><i class="fa-solid fa-book-open me-2"></i>Formações a decorrer</span>
+                <a asp-controller="Alocacao" class="btn btn-primary btn-sm" asp-action="index">Ver todos</a>
+            </div>
+            <div class="card-body p-0">
+                
+            @if (Model.TabelaAlocacoes != null && Model.TabelaAlocacoes.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-4">Descrição</th>
+                                <th class="ps-4">Formador</th>
+                                <th>Data Início</th>
+                                <th>Data Fim</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                                @foreach (var alocacao in Model.TabelaAlocacoes)
+                                {
+                                    <tr>
+                                        <td class="ps-4">
+                                            <div class="fw-semibold text-dark">@alocacao.Descricao</div>
+                                        </td>
+                                        <td class="ps-4">
+                                            <div class="fw-semibold text-dark">@alocacao.NomeFuncionario</div>
+                                        </td>
+                                        <td>
+                                            <span class="text-muted small"><i class="fa-regular fa-calendar me-1"></i>@alocacao.DataInicio.ToString("dd/MM/yyyy")</span>
+                                        </td>
+                                        <td>
+                                            <span class="text-muted small"><i class="fa-regular fa-calendar-check me-1"></i>@alocacao.DataFim.ToString("dd/MM/yyyy")</span>
+                                        </td>
+                                    </tr>
+                                }
+                        </tbody>
+                    </table>
+                </div>
+                }
+                else
+                {
+                    <div class="text-center py-5">
+                        <i class="fa-solid fa-book-open text-muted mb-2" style="font-size: 2rem; opacity: 0.3;"></i>
+                        <h5 class="text-muted">Não existem formações a decorrer</h5>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+
+        $(document).ready(function () {
+            var ctx = document.getElementById('graficoCargos').getContext('2d');
+
+            var dadosCargos = {
+                labels: [
+                `Formadores (@Model.QtdFormadores)`,
+                `Secretarias (@Model.QtdSecretarias)`,
+                `Coordenadores (@Model.QtdCoordenadores)`,
+                `Diretores (@Model.QtdDiretores)`
+                ],
+                datasets: [{
+                    // Usamos InvariantCulture para garantir que o decimal vem com ponto (.) e não vírgula (,)
+                    data: [
+                        @Model.TotalFormadores.ToString(System.Globalization.CultureInfo.InvariantCulture), 
+                        @Model.TotalSecretarias.ToString(System.Globalization.CultureInfo.InvariantCulture), 
+                        @Model.TotalCoordenadores.ToString(System.Globalization.CultureInfo.InvariantCulture), 
+                        @Model.TotalDiretores.ToString(System.Globalization.CultureInfo.InvariantCulture)
+                    ],
+                    backgroundColor: ['#06B6D4', '#F59E0B', '#1A365D', '#5287C5'],
+                    borderWidth: 0,
+                    hoverOffset: 15 // Aumentei um pouco para dar destaque ao passar o rato
+                }]
+            };
+
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: dadosCargos,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    layout:{
+                        padding: 15
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 20,
+                                // Formata a legenda para mostrar o nome e o valor
+                                font: { size: 13 }
+                            }
+                        },
+                        // ADICIONAR ISTO: Formata o popup que aparece ao passar o rato
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) { label += ': '; }
+                                    if (context.parsed !== null) {
+                                        // Formata como moeda: 1250.5 -> 1.250,50 €
+                                        label += new Intl.NumberFormat('pt-PT', { style: 'currency', currency: 'EUR' }).format(context.parsed);
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+}

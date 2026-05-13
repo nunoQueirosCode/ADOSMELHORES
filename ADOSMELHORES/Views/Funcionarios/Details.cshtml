@@ -1,0 +1,767 @@
+﻿@model ADOSMELHORES.Data.Empresa.Funcionario
+@using System.Globalization
+@using ADOSMELHORES.Data.Empresa
+@{
+    ViewData["Title"] = "Detalhes do Funcionário";
+    
+    var dataSistemaStr = Context.Request.Cookies["DataSistema"];
+    DateTime dataReferencia = DateTime.TryParse(dataSistemaStr, out DateTime dt) ? dt : DateTime.Today;
+
+	bool ContratoAExpirar = false;
+    if((Model.DataFimContrato >= dataReferencia) && (Model.DataFimContrato <= dataReferencia.AddDays(30)))
+    {
+        ContratoAExpirar = true;
+	}
+	bool registoAExpirar = false;
+    if ((Model.DataFimContrato >= dataReferencia) && (Model.DataRegistoCriminal <= dataReferencia.AddDays(30)))
+    {
+        registoAExpirar = true;
+    }
+}
+@functions {
+    public string ObterIniciais(string nome)
+    {
+        if (string.IsNullOrWhiteSpace(nome))
+            return "";
+
+        var palavras = nome.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+        if (palavras.Length == 1)
+            return palavras[0].Substring(0, 1).ToUpper();
+
+        string primeiraLetra = palavras[0].Substring(0, 1);
+        string ultimaLetra = palavras[palavras.Length - 1].Substring(0, 1);
+
+        return (primeiraLetra + ultimaLetra).ToUpper();
+    }
+}
+<!-- Cabeçalho com Botão de Voltar -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 style="color: var(--azul-conhecimento); font-weight: 700; margin-bottom: 0;">Detalhes do Funcionário</h2>
+        <span class="text-muted">Informação completa e gestão de documentação</span>
+    </div>
+    <a asp-action="Index" class="btn btn-light border">
+        <i class="fa-solid fa-arrow-left me-2"></i>Voltar à Lista
+    </a>
+</div>
+
+<!-- SECÇÃO DE ALERTAS / AVISOS -->
+@if (registoAExpirar)
+{
+    <div class="alert alert-warning d-flex align-items-center shadow-sm mb-4" role="alert" style="border-left: 5px solid #ffc107;">
+        <i class="fa-solid fa-triangle-exclamation fs-3 me-3 text-warning"></i>
+        <div class="flex-grow-1">
+            <h5 class="alert-heading mb-1 fw-bold">Atenção: Registo Criminal a Expirar!</h5>
+            <p class="mb-0">O registo criminal deste funcionário expira em breve (ou já expirou). É necessário atualizar este documento legal para manter as funções ativas.</p>
+        </div>
+        <!-- Botão que abre o Modal -->
+        <button type="button" class="btn btn-warning fw-bold ms-3" data-bs-toggle="modal" data-bs-target="#modalRegistoCriminal">
+            <i class="fa-solid fa-calendar-check me-2"></i>Atualizar Data
+        </button>
+    </div>
+}
+
+
+@if (ContratoAExpirar)
+{
+    <div class="alert alert-warning d-flex align-items-center shadow-sm mb-4" role="alert" style="border-left: 5px solid #ffc107;">
+        <i class="fa-solid fa-triangle-exclamation fs-3 me-3 text-warning"></i>
+        <div class="flex-grow-1">
+            <h5 class="alert-heading mb-1 fw-bold">Atenção: Contrato a Expirar!</h5>
+            <p class="mb-0">O contrato deste funcionário expira em breve. É necessário atualizar este documento legal para manter as funções ativas.</p>
+        </div>
+        <!-- Botão que abre o Modal -->
+        <button type="button" class="btn btn-warning fw-bold ms-3" data-bs-toggle="modal" data-bs-target="#modalContrato">
+            <i class="fa-solid fa-calendar-check me-2"></i>Atualizar Data
+        </button>
+    </div>
+}
+<!-- DETALHES DO FUNCIONÁRIO (Layout em 2 Colunas) -->
+<div class="row">
+    <!-- Coluna Esquerda: Info Principal -->
+    <div class="col-md-4 mb-4">
+        <div class="card card-ados h-100">
+            <div class="card-body text-center p-4">
+                <div class="bg-light rounded-circle d-flex justify-content-center align-items-center mx-auto mb-3" style="width: 100px; height: 100px; color: var(--azul-conhecimento); font-size: 2rem;">
+                    <!-- Podes pôr as iniciais dinâmicas aqui ou a foto de perfil -->
+                    <strong>@ObterIniciais(Model.Nome)</strong>
+                </div>
+                <h4 class="fw-bold" style="color: var(--azul-conhecimento);">@Model.Nome</h4>
+                <p class="text-muted mb-1">@Model.GetType().Name</p>
+                
+                <hr />
+                
+                <div class="text-start mt-4">
+                    <p class="mb-2"><i class="fa-solid fa-phone me-2" style="color: var(--ciano-evolucao);"></i> <strong>Telefone:</strong><br /> @Model.Contacto</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Coluna Direita: Mais Detalhes e Ações -->
+    <div class="col-md-8 mb-4">
+        <div class="card card-ados h-100">
+            <div class="card-header card-ados-header d-flex justify-content-between align-items-center">
+                <span><i class="fa-solid fa-circle-info me-2"></i>Informação Detalhada</span>
+                <!-- Botões de Ação Principais -->
+                <div>
+					@if (Model.GetType().Name == "Formador"){
+                        <button type="button" class="btn btn-success btn-sm me-2" data-bs-toggle="modal" data-bs-target="#modalCalcularVencimento">
+                            <i class="fa-solid fa-calculator"></i> Calcular Vencimento
+                        </button>
+                    }
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-ados btn-sm me-2">
+                        <i class="fa-solid fa-pen"></i> Editar
+                    </a>
+                    <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modalDelete">
+                        <i class="fa-solid fa-trash"></i> Eliminar
+                    </button>
+                </div>
+            </div>
+            <div class="card-body p-4">
+                <div class="row">
+                    <div class="col-sm-6 mb-3">
+                        <span class="text-muted small text-uppercase fw-bold">Validade de Contrato</span>
+                        <p class="mb-0 @(ContratoAExpirar ? "text-danger fw-bold" : "text-dark")">
+                            @Model.DataFimContrato.ToString("dd 'de' MMMM 'de' yyyy")
+                            @if (ContratoAExpirar)
+                            {
+                                <i class="fa-solid fa-circle-exclamation ms-1"></i>
+                            }
+                        </p>
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <span class="text-muted small text-uppercase fw-bold">Validade Registo Criminal</span>
+                        <!-- Destacar a data se estiver a expirar -->
+                        <p class="mb-0 @(registoAExpirar ? "text-danger fw-bold" : "text-dark")">
+                            @Model.DataRegistoCriminal.ToString("dd 'de' MMMM 'de' yyyy")
+                            @if (registoAExpirar) 
+                            {
+                                <i class="fa-solid fa-circle-exclamation ms-1"></i>
+                            }
+                        </p>
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <span class="text-muted small text-uppercase fw-bold">Morada Completa</span>
+                        <p class="mb-0 text-dark">@Model.Morada</p>
+                    </div>
+                    
+                </div>
+                
+                @if (Model is Diretor diretor)
+                {
+                    <hr />
+                    <div class="row">
+
+                        <div class="col-sm-6 mb-3">
+                            <span class="text-muted small text-uppercase fw-bold">Salário Base</span>
+                            <p class="mb-0 text-dark">€@diretor.Salario.ToString("N0", new CultureInfo("pt-PT"))</p>
+                        </div>
+
+                        <div class="col-sm-6 mb-3">
+                            <span class="text-muted small text-uppercase fw-bold">Bónus Mensal (€)</span>
+                            <p class="mb-0 text-dark">€@( (diretor.BonusMensal ?? 0).ToString("N0", new CultureInfo("pt-PT")) )</p>
+                        </div>
+
+                        <div class="col-sm-6 mb-3">
+                            <span class="text-muted small text-uppercase fw-bold">Isenção de Horário</span>
+                            <p class="mb-0 text-dark">@(diretor.IsencaoHorario == true ? "Sim" : "Não")</p>
+                        </div>
+
+                        <div class="col-sm-6 mb-3">
+                            <span class="text-muted small text-uppercase fw-bold">Viatura da Empresa</span>
+                            <p class="mb-0 text-dark">@(diretor.CarroEmpresa == true ? "Sim" : "Não")</p>
+                        </div>
+
+                    </div>
+                }
+
+                @if (Model is Secretaria secretaria)
+                {
+                    <!--DADOS SECRETARIA-->
+                    <hr />
+                    <div class="row">
+
+                        <div class="col-sm-6 mb-3">
+                            <span class="text-muted small text-uppercase fw-bold">Salário Base</span>
+                            <p class="mb-0 text-dark">€@secretaria.Salario.ToString("N0", new CultureInfo("pt-PT"))</p>
+                        </div>
+
+                        <div class="col-sm-6 mb-3">
+                            <span class="text-muted small text-uppercase fw-bold">Departamento</span>
+                            <p class="mb-0 text-dark">@secretaria.Area</p>
+                        </div>
+
+                        <div class="col-sm-6 mb-3">
+                            <span class="text-muted small text-uppercase fw-bold">Superior</span>
+                            <p class="mb-0 text-dark">@(secretaria.DiretorQueReporta?.Nome ?? "Sem Diretor atribuído")</p>
+                        </div>
+
+                    </div>
+                }
+
+
+                @if (Model is Formador formador)
+                {
+                    <!--DADOS FORMADOR-->
+                    <hr />
+                    <div class="row">
+
+                        <div class="col-sm-6 mb-3">
+                            <span class="text-muted small text-uppercase fw-bold">Valor Hora</span>
+                            <p class="mb-0 text-dark">€@formador.ValorHora.ToString("N0", new CultureInfo("pt-PT"))</p>
+                        </div>
+
+                        <div class="col-sm-6 mb-3">
+                            <span class="text-muted small text-uppercase fw-bold">Coordenador</span>
+                            <p class="mb-0 text-dark">@(formador.Coordenador?.Nome ?? "Sem Coordenador atribuído")</p>
+                        </div>
+
+                        <div class="col-sm-6 mb-3">
+                            <span class="text-muted small text-uppercase fw-bold">Área de Ensino</span>
+                            <p class="mb-0 text-dark">@formador.AreaLecionada</p>
+                        </div>
+
+                        <div class="col-sm-6 mb-3">
+                            <span class="text-muted small text-uppercase fw-bold">Disponibilidade</span>
+                            <p class="mb-0 text-dark">@formador.TipoDisponibilidade</p>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mt-2 mb-3">
+                            <h5 class="fw-bold mb-0">Formações Atribuídas</h5>
+                            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#modalAdicionarAlocacao">
+                                <i class="fa-solid fa-plus me-1"></i> Nova Formação
+                            </button>
+                        </div>
+
+                        @if (formador.Alocacoes != null && formador.Alocacoes.Any())
+                        {
+                            <div class="table-responsive" id="listaAlocacoes">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead class="table-light" style="color: var(--azul-conhecimento);">
+                                        <tr>
+                                            <th class="ps-4">Descrição</th>
+                                            <th>Data de Início</th>
+                                            <th>Data de Fim</th>
+                                            <th class="text-end pe-4">Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var a in formador.Alocacoes)
+                                        {
+                                            <tr>
+                                                <td class="ps-4">
+                                                    <div class="fw-bold text-dark">@a.DescricaoFormacao</div>
+                                                </td>
+                                                <td>@a.DataInicio.ToString("dd/MM/yyyy")</td>
+                                                <td>@a.DataFim.ToString("dd/MM/yyyy")</td>
+                                                <td class="text-end pe-4">
+                                                    <button class="btn btn-sm btn-light text-danger"
+                                                            title="Remover Formação"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#modalRemoverAlocacao"
+                                                            data-id="@a.Id"
+                                                            data-nome="@a.DescricaoFormacao">
+                                                        <i class="fa-solid fa-trash-can" style="pointer-events: none;"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+
+                        <div id="mensagemSemAlocacoes" class="text-center py-5" style="@((formador.Alocacoes?.Any() == true) ? "display: none;" : "")">
+                            <i class="fa-solid fa-book-open text-muted mb-2" style="font-size: 2rem; opacity: 0.3;"></i>
+                            <h5 class="text-muted">Sem formações associadas</h5>
+                            <p class="text-muted small mb-0">Este formador ainda não tem nenhuma formação atribuída.</p>
+                        </div>
+
+                    </div>
+
+                }
+
+                @if (Model is Coordenador coordenador)
+                {
+                <!--DADOS COORDENADOR-->
+                <hr />
+                <div class="row">
+                    
+                    <div class="col-sm-6 mb-3">
+                        <span class="text-muted small text-uppercase fw-bold">Salário Base</span>
+                        <p class="mb-0 text-dark">€@coordenador.Salario.ToString("N0", new CultureInfo("pt-PT"))</p>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mt-2 mb-3">
+                        <h5 class="fw-bold mb-0">Equipa de Formadores</h5>
+                    </div>
+                    
+                    @if (coordenador.FormadoresAlocados != null && coordenador.FormadoresAlocados.Any())
+                    {
+                        <div class="table-responsive" id="listaFormadores">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light" style="color: var(--azul-conhecimento);">
+                                    <tr>
+                                        <th class="ps-4">Nome do Formador</th>
+                                        <th>Área de Ensino</th>
+                                        <th>Disponibilidade</th>
+                                        <th>Valor/Hora</th>
+                                        <th class="text-end pe-4">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var f in coordenador.FormadoresAlocados)
+                                    {
+                                        <tr>
+                                            <td class="ps-4">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="fw-bold text-dark">@f.Nome</div>
+                                                </div>
+                                            </td>
+                                            <td>@f.AreaLecionada</td>
+                                            <td>
+                                               @f.TipoDisponibilidade
+                                            </td>
+                                            <td>€@f.ValorHora.ToString("N2", new CultureInfo("pt-PT"))</td>
+                                            <td class="text-end pe-4">
+                                                <a asp-controller="Funcionarios" asp-action="Details" asp-route-id="@f.Id" class="btn btn-sm btn-light text-info" title="Ver Formador">
+                                                    <i class="fa-solid fa-eye"></i>
+                                                </a>
+                                                <button class="btn btn-sm btn-light text-danger"
+                                                        title="Remover da Equipa"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#modalRemoverFormador"
+                                                        data-id="@f.Id"
+                                                        data-nome="@f.Nome">
+                                                    <i class="fa-solid fa-link-slash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    <div id="mensagemSemFormadores" class="text-center py-5" style="@(coordenador.FormadoresAlocados.Any() ? "display: none;" : "")">
+                        <i class="fa-solid fa-user-slash text-muted mb-2" style="font-size: 2rem; opacity: 0.3;"></i>
+                        <h5 class="text-muted">Sem formadores associados</h5>
+                        <p class="text-muted small mb-0">Este coordenador ainda não tem nenhum formador atribuído.</p>
+                    </div>
+                </div>
+                }
+
+
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+@if (registoAExpirar)
+{
+    <!-- Modal para Atualizar Data do Registo Criminal -->
+    <div class="modal fade" id="modalRegistoCriminal" tabindex="-1" aria-labelledby="modalRegistoCriminalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+
+                <!-- O formulário vai enviar a nova data para uma ação no teu Controller -->
+                <form asp-action="UpdateRegistoCriminal" method="post">
+                    <!-- Input escondido com o ID do funcionário -->
+                    <input type="hidden" name="id" value="@Model?.Id" />
+
+                    <div class="modal-header bg-warning border-0">
+                        <h5 class="modal-title fw-bold text-dark" id="modalRegistoCriminalLabel">
+                            <i class="fa-solid fa-calendar-check me-2"></i>Renovar Registo Criminal
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body p-4">
+                        <p class="text-muted mb-3">Insira a nova data de validade do documento entregue pelo funcionário.</p>
+                        <div class="mb-3">
+                            <label for="NovaDataRegisto" class="form-label fw-bold">Nova Data de Validade:</label>
+                            <!-- O DatePicker nativo do HTML5 (funciona perfeitamente e é gerido pelo Bootstrap) -->
+                            <input type="date" class="form-control form-control-lg" id="novaDataRegisto" name="novaDataRegisto" value="@dataReferencia.ToString("yyyy-MM-dd")" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0 bg-light">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-warning fw-bold">Guardar Nova Data</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+}
+
+@if (ContratoAExpirar)
+{
+    <div class="modal fade" id="modalContrato" tabindex="-1" aria-labelledby="modalContratoLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+
+                <!-- O formulário vai enviar a nova data para uma ação no teu Controller -->
+                <form asp-action="UpdateContrato" method="post">
+                    <!-- Input escondido com o ID do funcionário -->
+                    <input type="hidden" name="id" value="@Model?.Id" />
+
+                    <div class="modal-header bg-warning border-0">
+                        <h5 class="modal-title fw-bold text-dark" id="modalContratoLabel">
+                            <i class="fa-solid fa-calendar-check me-2"></i>Renovar Contrato
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body p-4">
+                        <p class="text-muted mb-3">Insira a nova data de validade do documento entregue pelo funcionário.</p>
+                        <div class="mb-3">
+                            <label for="NovaDataRegisto" class="form-label fw-bold">Nova Data de Validade:</label>
+                            <!-- O DatePicker nativo do HTML5 (funciona perfeitamente e é gerido pelo Bootstrap) -->
+                            <input type="date" class="form-control form-control-lg" id="NovaDataContrato" name="novaDataContrato" value="@dataReferencia.ToString("yyyy-MM-dd")" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0 bg-light">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-warning fw-bold">Guardar Nova Data</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+}
+<!-- Modal de Confirmação de Eliminação (Segurança Extra) -->
+<div class="modal fade" id="modalDelete" tabindex="-1" aria-labelledby="modalDeleteLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-danger text-white border-0">
+                <h5 class="modal-title fw-bold" id="modalDeleteLabel">
+                    <i class="fa-solid fa-triangle-exclamation me-2"></i>Confirmar Eliminação
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4 text-center">
+                <i class="fa-solid fa-trash text-danger mb-3" style="font-size: 3rem;"></i>
+                <h4>Tens a certeza?</h4>
+                <p class="text-muted">Estás prestes a eliminar este funcionário permanentemente. Esta ação não pode ser desfeita.</p>
+            </div>
+            <div class="modal-footer border-0 bg-light justify-content-center">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form asp-action="DeleteConfirmed" method="post">
+                    <input type="hidden" name="id" value="@Model?.Id" />
+                    <button type="submit" class="btn btn-danger">Sim, Eliminar Funcionário</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (Model is Coordenador)
+ {
+<!--Modal para confrimar remoção de formador da equipa-->
+<div class="modal fade" id="modalRemoverFormador" tabindex="-1" aria-labelledby="modalRemoverLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-danger text-white border-0">
+                <h5 class="modal-title fw-bold" id="modalRemoverLabel">
+                    <i class="fa-solid fa-link-slash me-2"></i>Remover Formador
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+                <form id="formRemoverFormador" asp-action="RemoverAssociacao">
+                <input type="hidden" name="formadorId" id="formadorIdModal" value="" />
+                <input type="hidden" name="coordenadorId" id="coordenadorIdModal" value="@Model.Id" />
+
+                <div class="modal-body p-4 text-center">
+                    <i class="fa-solid fa-user-minus text-danger mb-3" style="font-size: 3rem;"></i>
+                    <h4>Tens a certeza?</h4>
+                    <p class="text-muted mb-0">Estás prestes a remover o formador <strong id="nomeFormadorModal" class="text-dark"></strong> da equipa deste coordenador.</p>
+                </div>
+                
+                <div class="modal-footer border-0 bg-light justify-content-center">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">Sim, Remover Formador</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+}
+
+
+@if (Model is Formador)
+ {
+<!--Modal para calculo de vencimento do Formador-->
+<div class="modal fade" id="modalCalcularVencimento" tabindex="-1" aria-labelledby="modalCalcLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-success text-white border-0">
+                <h5 class="modal-title fw-bold" id="modalCalcLabel">
+                    <i class="fa-solid fa-calculator me-2"></i>Calcular Vencimento
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                
+                <form id="formCalcularVencimento">
+                    <input type="hidden" id="calcFormadorId" value="@Model.Id" />
+                    <div id="erroVencimento" class="alert alert-warning d-none mb-3 text-center" role="alert"></div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-muted text-uppercase">Data Início</label>
+                            <input type="date" class="form-control" id="calcDataInicio" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-muted text-uppercase">Data Fim</label>
+                            <input type="date" class="form-control" id="calcDataFim" required>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 text-center">
+                        <button type="submit" class="btn btn-success w-100 fw-bold" id="btnCalcular">
+                            Calcular Total a Pagar
+                        </button>
+                    </div>
+                </form>
+
+                <div id="resultadoCalculo" class="mt-4 d-none">
+                    <div class="alert alert-success mb-0 text-center border-success" style="background-color: #f0fdf4;">
+                        <h6 class="mb-1 text-success text-uppercase small fw-bold">Valor a Pagar:</h6>
+                        <h2 class="fw-bold mb-1 text-success" id="valorFinalDisplay">0,00 €</h2>
+                        <span class="badge bg-success bg-opacity-25 text-success" id="detalhesCalculoDisplay">
+                            0 dias x 6h x 0€/h
+                        </span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+    <!--Modal para a atribuição de nova alocação do Formador-->
+    <div class="modal fade" id="modalAdicionarAlocacao" tabindex="-1" aria-labelledby="modalAdicionarAlocacaoLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+            
+                <form asp-action="AlocacaoFuncionario" method="post" id="formAdicionarAlocacao">
+                    <input type="hidden" name="idFormador" value="@Model.Id" />
+                    
+                    <div class="modal-header bg-primary border-0">
+                        <h5 class="modal-title fw-bold text-white" id="modalAdicionarAlocacaoLabel">
+                            <i class="fa-solid fa-calendar-plus me-2"></i>Atribuir Nova Formação
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                
+                    <div class="modal-body p-4">
+                        <div id="erroAlocacao" class="alert alert-warning d-none mb-3 text-center" role="alert">
+                        </div>
+                        <div class="mb-3">
+                            <label for="descricao" class="form-label fw-bold">Descrição da Formação:</label>
+                            <input type="text" class="form-control" id="descricao" name="descricao" placeholder="Ex: Curso de ASP.NET Core">
+                        </div>
+                    
+                        <div class="row">
+                            <div class="col-sm-6 mb-3">
+                                <label for="dataInicio" class="form-label fw-bold">Data de Início:</label>
+                                <input type="date" class="form-control" id="dataInicio" name="dataInicio" value="@dataReferencia.ToString("yyyy-MM-dd")" required>
+                            </div>
+                            <div class="col-sm-6 mb-3">
+                                <label for="dataFim" class="form-label fw-bold">Data de Fim:</label>
+                                <input type="date" class="form-control" id="dataFim" name="dataFim" value="@dataReferencia.ToString("yyyy-MM-dd")"  required>
+                            </div>
+                        </div>
+                    </div>
+                
+                    <div class="modal-footer border-0 bg-light">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary fw-bold">Guardar Formação</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+
+    <script>
+        var isCoordenador = @((Model is Coordenador).ToString().ToLower());
+    
+        if (isCoordenador) {
+            $(document).ready(function () {
+            
+                var linhaParaRemover = null;
+
+                // 1. Quando o modal abre, preenchemos os dados E guardamos a linha
+                $('#modalRemoverFormador').on('show.bs.modal', function (event) {
+                
+                    var button = event.relatedTarget;
+                
+                    var formadorId = button.getAttribute('data-id');
+                    var formadorNome = button.getAttribute('data-nome');
+                
+                    var modal = $(this);
+                    modal.find('#formadorIdModal').val(formadorId);
+                    modal.find('#nomeFormadorModal').text(formadorNome);
+
+                    linhaParaRemover = $(button).closest('tr');
+                });
+
+                // 2. Quando o utilizador clica em "Sim, Remover"
+                $('#formRemoverFormador').submit(function (e) {
+                    e.preventDefault(); // Impede o refresh da página
+
+                    var formadorId = $('#formadorIdModal').val();
+                    var coordenadorId = $('#coordenadorIdModal').val();
+                
+                    var btnSubmit = $(this).find('button[type="submit"]');
+                    var textoOriginal = btnSubmit.html();
+                    btnSubmit.html('<i class="fa-solid fa-spinner fa-spin me-2"></i>A remover...').prop('disabled', true);
+
+                    // 3. Fazer o pedido AJAX
+                    $.ajax({
+                        url: '/Funcionarios/RemoverAssociacao', 
+                        type: 'POST',
+                        data: {
+                            formadorId: formadorId,
+                            coordenadorId: coordenadorId
+                        },
+                        success: function (response) {
+                            if (response.sucesso) {
+                            
+                                $('#modalRemoverFormador').modal('hide');
+
+                                if (linhaParaRemover) {
+                                    linhaParaRemover.css('background-color', '#fee2e2');
+                                    linhaParaRemover.fadeOut(600, function () {
+                                        $(this).remove();
+                    
+                                        var totalAtuais = $('#listaFormadores table tbody tr').length;
+
+                                        if (totalAtuais === 0) {
+                                            $('#listaFormadores').hide();
+                                            $('#mensagemSemFormadores').fadeIn(500);
+                                        }
+                                    });
+                                }
+                            } 
+                        },
+                        error: function () {
+                            alert('Ocorreu um erro ao tentar comunicar com o servidor.');
+                        },
+                        complete: function () {
+                            btnSubmit.html(textoOriginal).prop('disabled', false);
+                        }
+                    });
+                }); 
+
+            }); 
+            
+        } 
+    </script>
+
+    <script>
+        var isFormador = @((Model is Formador).ToString().ToLower());
+        if(isFormador){
+            $(document).ready(function () {
+            
+                $('#formCalcularVencimento').submit(function (e) {
+                    e.preventDefault(); // Impede que a página faça refresh
+
+                    // 1. Obter os valores do modal
+                    var idFormador = $('#calcFormadorId').val();
+                    var dataInicio = $('#calcDataInicio').val();
+                    var dataFim = $('#calcDataFim').val();
+                    
+                    var divErro = $('#erroVencimento');
+                    // 2. Colocar o botão em estado de "A carregar..." para dar feedback ao utilizador
+                    var btn = $('#btnCalcular');
+                    var textoOriginal = btn.html();
+                    btn.html('<i class="fa-solid fa-spinner fa-spin me-2"></i>A calcular...').prop('disabled', true);
+
+                    // 3. Fazer o pedido AJAX ao Controlador
+                    $.ajax({
+                        url: '/Funcionarios/CalcularVencimento', // O nome do teu método no C#
+                        type: 'POST',
+                        data: {
+                            id: idFormador,
+                            dataInicio: dataInicio,
+                            dataFim: dataFim
+                        },
+                        success: function (response) {
+                            if (response.sucesso) {
+                                divErro.text(response.mensagem).addClass('d-none');
+                                // Se correu bem, injetamos os dados no HTML e mostramos a div
+                                $('#valorFinalDisplay').text(response.valorTotalFormatado);
+                                $('#detalhesCalculoDisplay').text(response.detalhesCalculo);
+                                
+                                // Animação suave para mostrar o resultado
+                                $('#resultadoCalculo').removeClass('d-none').hide().fadeIn();
+                            } else {
+                                divErro.text(response.mensagem).removeClass('d-none');
+                            }
+                        },
+                        error: function () {
+                            alert('Ocorreu um erro de comunicação com o servidor.');
+                        },
+                        complete: function() {
+                            // Independentemente de dar erro ou sucesso, restauramos o botão ao normal
+                            btn.html(textoOriginal).prop('disabled', false);
+                        }
+                    });
+                });
+
+                // Truque de UI: Limpar o modal sempre que ele é fechado, para estar limpo na próxima vez
+                $('#modalCalcularVencimento').on('hidden.bs.modal', function () {
+                    $('#resultadoCalculo').addClass('d-none');
+                    $('#formCalcularVencimento')[0].reset();
+                });
+
+
+            $('#formAdicionarAlocacao').submit(function (e) {
+                e.preventDefault();
+
+                var form = $(this);
+                var btnSubmit = form.find('button[type="submit"]');
+                var textoOriginal = btnSubmit.html();
+                var divErro = $('#erroAlocacao');
+
+                // 1. Limpa erros antigos e coloca o botão em "A guardar..."
+                divErro.addClass('d-none').text('');
+                btnSubmit.html('<i class="fa-solid fa-spinner fa-spin me-2"></i>A guardar...').prop('disabled', true);
+
+                // 2. Faz o pedido AJAX
+                $.ajax({
+                    url: form.attr('action'), // Vai buscar o URL automaticamente ao 'asp-action'
+                    type: 'POST',
+                    data: form.serialize(), // O serialize() apanha magicamente todos os inputs e o Token de Segurança!
+                    success: function (response) {
+                        if (response.sucesso) {
+                            // SUCESSO!
+                            // Opcão mais simples: Recarregar a página para a nova formação aparecer na tabela
+                            location.reload();
+                        } else {
+                            // ERRO DO C#: Mostrar a mensagem de erro no Modal
+                            divErro.text(response.mensagem).removeClass('d-none');
+                            // Restaura o botão para o utilizador poder tentar de novo
+                            btnSubmit.html(textoOriginal).prop('disabled', false);
+                        }
+                    },
+                    error: function () {
+                        // ERRO DE REDE/SERVIDOR
+                        divErro.text('Ocorreu um erro de comunicação com o servidor.').removeClass('d-none');
+                        btnSubmit.html(textoOriginal).prop('disabled', false);
+                    }
+                });
+            });
+
+        });
+        }
+    </script>
+ 
+}
