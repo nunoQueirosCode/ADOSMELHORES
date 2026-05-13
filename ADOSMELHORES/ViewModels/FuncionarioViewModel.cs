@@ -9,10 +9,10 @@ namespace ADOSMELHORES.ViewModels
     {
         public Guid Id { get; set; }
 
-        [Required(ErrorMessage = "Tem que selecionar o tipo de funcionário.")]
+        [Required(ErrorMessage = "Campo obrigatório.")]
         public string TipoFuncionario { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Tem que inserir o nome do funcionário.")]
+        [Required(ErrorMessage = "Campo obrigatório.")]
         public string Nome { get; set; } = string.Empty;
         public string Morada { get; set; } = string.Empty;
         public string Contacto { get; set; } = string.Empty;
