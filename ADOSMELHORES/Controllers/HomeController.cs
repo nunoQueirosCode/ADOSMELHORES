@@ -31,8 +31,11 @@ namespace ADOSMELHORES.Controllers
             var model = new HomeIndexViewModel();
 
             decimal TotalDiretores = funcionarios.OfType<Diretor>().Sum(d => d.Salario + (d.BonusMensal ?? 0));
+            model.TotalDiretores = TotalDiretores;
             decimal TotalSecretarias = funcionarios.OfType<Secretaria>().Sum(s => s.Salario);
+            model.TotalSecretarias = TotalSecretarias;
             decimal TotalCoordenadores = funcionarios.OfType<Coordenador>().Sum(c => c.Salario);
+            model.TotalCoordenadores = TotalCoordenadores;
 
             DateTime inicioDoMes = new DateTime(dataAtualDoSistema.Year, dataAtualDoSistema.Month, 1);
             DateTime fimDoMes = inicioDoMes.AddMonths(1).AddDays(-1);
@@ -44,6 +47,8 @@ namespace ADOSMELHORES.Controllers
                     DateTime dataCalculoFim = a.DataFim > fimDoMes ? fimDoMes : a.DataFim;
                     return ContarDiasUteis(dataCalculoInicio, dataCalculoFim) * 6 * f.ValorHora;
                 }) ?? 0);
+
+            model.TotalFormadores = TotalFormadores;    
 
             model.TotalGeral = TotalDiretores + TotalSecretarias + TotalCoordenadores + TotalFormadores;
 
