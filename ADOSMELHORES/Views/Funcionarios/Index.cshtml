@@ -64,7 +64,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                   @foreach (var funcionario in Model)
+                    @foreach (var funcionario in Model)
                     {
                         <tr>
                             <td>
@@ -93,7 +93,7 @@
                                     </div>
                                 </div>
                             </td>
-                            <td>@funcionario.GetType().Name</td>
+                            <td>@(funcionario.GetType().Name == "Secretaria" ? "Secretária" : funcionario.GetType().Name)</td>
                             <td>@funcionario.Contacto</td>
                             <td class="text-end">
                                 <a asp-action="Details" asp-route-id="@funcionario.Id" class="btn btn-sm btn-light text-info me-1" title="Detalhes">
@@ -102,7 +102,6 @@
                             </td>
                         </tr>
                     }
-
                 </tbody>
             </table>
         </div>

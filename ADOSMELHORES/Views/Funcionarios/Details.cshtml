@@ -7,12 +7,12 @@
     var dataSistemaStr = Context.Request.Cookies["DataSistema"];
     DateTime dataReferencia = DateTime.TryParse(dataSistemaStr, out DateTime dt) ? dt : DateTime.Today;
 
-	bool ContratoAExpirar = false;
-    if((Model.DataFimContrato >= dataReferencia) && (Model.DataFimContrato <= dataReferencia.AddDays(30)))
+    bool ContratoAExpirar = false;
+    if ((Model.DataFimContrato >= dataReferencia) && (Model.DataFimContrato <= dataReferencia.AddDays(30)))
     {
         ContratoAExpirar = true;
-	}
-	bool registoAExpirar = false;
+    }
+    bool registoAExpirar = false;
     if ((Model.DataFimContrato >= dataReferencia) && (Model.DataRegistoCriminal <= dataReferencia.AddDays(30)))
     {
         registoAExpirar = true;
@@ -88,8 +88,9 @@
                     <strong>@ObterIniciais(Model.Nome)</strong>
                 </div>
                 <h4 class="fw-bold" style="color: var(--azul-conhecimento);">@Model.Nome</h4>
-                <p class="text-muted mb-1">@Model.GetType().Name</p>
-                
+                <p class="text-muted mb-1">
+                    @(Model.GetType().Name == "Secretaria" ? "Secretária" : Model.GetType().Name)
+                </p>
                 <hr />
                 
                 <div class="text-start mt-4">
@@ -107,7 +108,8 @@
                 <span><i class="fa-solid fa-circle-info me-2"></i>Informação Detalhada</span>
                 <!-- Botões de Ação Principais -->
                 <div>
-					@if (Model.GetType().Name == "Formador"){
+                    @if (Model.GetType().Name == "Formador")
+                    {
                         <button type="button" class="btn btn-success btn-sm me-2" data-bs-toggle="modal" data-bs-target="#modalCalcularVencimento">
                             <i class="fa-solid fa-calculator"></i> Calcular Vencimento
                         </button>
@@ -137,7 +139,7 @@
                         <!-- Destacar a data se estiver a expirar -->
                         <p class="mb-0 @(registoAExpirar ? "text-danger fw-bold" : "text-dark")">
                             @Model.DataRegistoCriminal.ToString("dd 'de' MMMM 'de' yyyy")
-                            @if (registoAExpirar) 
+                            @if (registoAExpirar)
                             {
                                 <i class="fa-solid fa-circle-exclamation ms-1"></i>
                             }
@@ -286,70 +288,70 @@
 
                 @if (Model is Coordenador coordenador)
                 {
-                <!--DADOS COORDENADOR-->
-                <hr />
-                <div class="row">
+                    <!--DADOS COORDENADOR-->
+                    <hr />
+                    <div class="row">
                     
-                    <div class="col-sm-6 mb-3">
-                        <span class="text-muted small text-uppercase fw-bold">Salário Base</span>
-                        <p class="mb-0 text-dark">€@coordenador.Salario.ToString("N0", new CultureInfo("pt-PT"))</p>
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center mt-2 mb-3">
-                        <h5 class="fw-bold mb-0">Equipa de Formadores</h5>
-                    </div>
-                    
-                    @if (coordenador.FormadoresAlocados != null && coordenador.FormadoresAlocados.Any())
-                    {
-                        <div class="table-responsive" id="listaFormadores">
-                            <table class="table table-hover align-middle mb-0">
-                                <thead class="table-light" style="color: var(--azul-conhecimento);">
-                                    <tr>
-                                        <th class="ps-4">Nome do Formador</th>
-                                        <th>Área de Ensino</th>
-                                        <th>Disponibilidade</th>
-                                        <th>Valor/Hora</th>
-                                        <th class="text-end pe-4">Ações</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var f in coordenador.FormadoresAlocados)
-                                    {
-                                        <tr>
-                                            <td class="ps-4">
-                                                <div class="d-flex align-items-center">
-                                                    <div class="fw-bold text-dark">@f.Nome</div>
-                                                </div>
-                                            </td>
-                                            <td>@f.AreaLecionada</td>
-                                            <td>
-                                               @f.TipoDisponibilidade
-                                            </td>
-                                            <td>€@f.ValorHora.ToString("N2", new CultureInfo("pt-PT"))</td>
-                                            <td class="text-end pe-4">
-                                                <a asp-controller="Funcionarios" asp-action="Details" asp-route-id="@f.Id" class="btn btn-sm btn-light text-info" title="Ver Formador">
-                                                    <i class="fa-solid fa-eye"></i>
-                                                </a>
-                                                <button class="btn btn-sm btn-light text-danger"
-                                                        title="Remover da Equipa"
-                                                        data-bs-toggle="modal"
-                                                        data-bs-target="#modalRemoverFormador"
-                                                        data-id="@f.Id"
-                                                        data-nome="@f.Nome">
-                                                    <i class="fa-solid fa-link-slash"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
+                        <div class="col-sm-6 mb-3">
+                            <span class="text-muted small text-uppercase fw-bold">Salário Base</span>
+                            <p class="mb-0 text-dark">€@coordenador.Salario.ToString("N0", new CultureInfo("pt-PT"))</p>
                         </div>
-                    }
-                    <div id="mensagemSemFormadores" class="text-center py-5" style="@(coordenador.FormadoresAlocados.Any() ? "display: none;" : "")">
-                        <i class="fa-solid fa-user-slash text-muted mb-2" style="font-size: 2rem; opacity: 0.3;"></i>
-                        <h5 class="text-muted">Sem formadores associados</h5>
-                        <p class="text-muted small mb-0">Este coordenador ainda não tem nenhum formador atribuído.</p>
+                        <div class="d-flex justify-content-between align-items-center mt-2 mb-3">
+                            <h5 class="fw-bold mb-0">Equipa de Formadores</h5>
+                        </div>
+                    
+                        @if (coordenador.FormadoresAlocados != null && coordenador.FormadoresAlocados.Any())
+                        {
+                            <div class="table-responsive" id="listaFormadores">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead class="table-light" style="color: var(--azul-conhecimento);">
+                                        <tr>
+                                            <th class="ps-4">Nome do Formador</th>
+                                            <th>Área de Ensino</th>
+                                            <th>Disponibilidade</th>
+                                            <th>Valor/Hora</th>
+                                            <th class="text-end pe-4">Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var f in coordenador.FormadoresAlocados)
+                                        {
+                                            <tr>
+                                                <td class="ps-4">
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="fw-bold text-dark">@f.Nome</div>
+                                                    </div>
+                                                </td>
+                                                <td>@f.AreaLecionada</td>
+                                                <td>
+                                                    @f.TipoDisponibilidade
+                                                </td>
+                                                <td>€@f.ValorHora.ToString("N2", new CultureInfo("pt-PT"))</td>
+                                                <td class="text-end pe-4">
+                                                    <a asp-controller="Funcionarios" asp-action="Details" asp-route-id="@f.Id" class="btn btn-sm btn-light text-info" title="Ver Formador">
+                                                        <i class="fa-solid fa-eye"></i>
+                                                    </a>
+                                                    <button class="btn btn-sm btn-light text-danger"
+                                                            title="Remover da Equipa"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#modalRemoverFormador"
+                                                            data-id="@f.Id"
+                                                            data-nome="@f.Nome">
+                                                        <i class="fa-solid fa-link-slash"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        <div id="mensagemSemFormadores" class="text-center py-5" style="@(coordenador.FormadoresAlocados.Any() ? "display: none;" : "")">
+                            <i class="fa-solid fa-user-slash text-muted mb-2" style="font-size: 2rem; opacity: 0.3;"></i>
+                            <h5 class="text-muted">Sem formadores associados</h5>
+                            <p class="text-muted small mb-0">Este coordenador ainda não tem nenhum formador atribuído.</p>
+                        </div>
                     </div>
-                </div>
                 }
 
 
@@ -459,88 +461,88 @@
 </div>
 
 @if (Model is Coordenador)
- {
-<!--Modal para confrimar remoção de formador da equipa-->
-<div class="modal fade" id="modalRemoverFormador" tabindex="-1" aria-labelledby="modalRemoverLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg">
-            <div class="modal-header bg-danger text-white border-0">
-                <h5 class="modal-title fw-bold" id="modalRemoverLabel">
-                    <i class="fa-solid fa-link-slash me-2"></i>Remover Formador
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
+{
+    <!--Modal para confrimar remoção de formador da equipa-->
+    <div class="modal fade" id="modalRemoverFormador" tabindex="-1" aria-labelledby="modalRemoverLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-danger text-white border-0">
+                    <h5 class="modal-title fw-bold" id="modalRemoverLabel">
+                        <i class="fa-solid fa-link-slash me-2"></i>Remover Formador
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
             
                 <form id="formRemoverFormador" asp-action="RemoverAssociacao">
-                <input type="hidden" name="formadorId" id="formadorIdModal" value="" />
-                <input type="hidden" name="coordenadorId" id="coordenadorIdModal" value="@Model.Id" />
+                    <input type="hidden" name="formadorId" id="formadorIdModal" value="" />
+                    <input type="hidden" name="coordenadorId" id="coordenadorIdModal" value="@Model.Id" />
 
-                <div class="modal-body p-4 text-center">
-                    <i class="fa-solid fa-user-minus text-danger mb-3" style="font-size: 3rem;"></i>
-                    <h4>Tens a certeza?</h4>
-                    <p class="text-muted mb-0">Estás prestes a remover o formador <strong id="nomeFormadorModal" class="text-dark"></strong> da equipa deste coordenador.</p>
-                </div>
+                    <div class="modal-body p-4 text-center">
+                        <i class="fa-solid fa-user-minus text-danger mb-3" style="font-size: 3rem;"></i>
+                        <h4>Tens a certeza?</h4>
+                        <p class="text-muted mb-0">Estás prestes a remover o formador <strong id="nomeFormadorModal" class="text-dark"></strong> da equipa deste coordenador.</p>
+                    </div>
                 
-                <div class="modal-footer border-0 bg-light justify-content-center">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-danger">Sim, Remover Formador</button>
-                </div>
-            </form>
+                    <div class="modal-footer border-0 bg-light justify-content-center">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-danger">Sim, Remover Formador</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-</div>
 }
 
 
 @if (Model is Formador)
- {
-<!--Modal para calculo de vencimento do Formador-->
-<div class="modal fade" id="modalCalcularVencimento" tabindex="-1" aria-labelledby="modalCalcLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg">
-            <div class="modal-header bg-success text-white border-0">
-                <h5 class="modal-title fw-bold" id="modalCalcLabel">
-                    <i class="fa-solid fa-calculator me-2"></i>Calcular Vencimento
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body p-4">
-                
-                <form id="formCalcularVencimento">
-                    <input type="hidden" id="calcFormadorId" value="@Model.Id" />
-                    <div id="erroVencimento" class="alert alert-warning d-none mb-3 text-center" role="alert"></div>
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold small text-muted text-uppercase">Data Início</label>
-                            <input type="date" class="form-control" id="calcDataInicio" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold small text-muted text-uppercase">Data Fim</label>
-                            <input type="date" class="form-control" id="calcDataFim" required>
-                        </div>
-                    </div>
-
-                    <div class="mt-4 text-center">
-                        <button type="submit" class="btn btn-success w-100 fw-bold" id="btnCalcular">
-                            Calcular Total a Pagar
-                        </button>
-                    </div>
-                </form>
-
-                <div id="resultadoCalculo" class="mt-4 d-none">
-                    <div class="alert alert-success mb-0 text-center border-success" style="background-color: #f0fdf4;">
-                        <h6 class="mb-1 text-success text-uppercase small fw-bold">Valor a Pagar:</h6>
-                        <h2 class="fw-bold mb-1 text-success" id="valorFinalDisplay">0,00 €</h2>
-                        <span class="badge bg-success bg-opacity-25 text-success" id="detalhesCalculoDisplay">
-                            0 dias x 6h x 0€/h
-                        </span>
-                    </div>
+{
+    <!--Modal para calculo de vencimento do Formador-->
+    <div class="modal fade" id="modalCalcularVencimento" tabindex="-1" aria-labelledby="modalCalcLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-success text-white border-0">
+                    <h5 class="modal-title fw-bold" id="modalCalcLabel">
+                        <i class="fa-solid fa-calculator me-2"></i>Calcular Vencimento
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
+                <div class="modal-body p-4">
+                
+                    <form id="formCalcularVencimento">
+                        <input type="hidden" id="calcFormadorId" value="@Model.Id" />
+                        <div id="erroVencimento" class="alert alert-warning d-none mb-3 text-center" role="alert"></div>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-muted text-uppercase">Data Início</label>
+                                <input type="date" class="form-control" id="calcDataInicio" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-muted text-uppercase">Data Fim</label>
+                                <input type="date" class="form-control" id="calcDataFim" required>
+                            </div>
+                        </div>
 
+                        <div class="mt-4 text-center">
+                            <button type="submit" class="btn btn-success w-100 fw-bold" id="btnCalcular">
+                                Calcular Total a Pagar
+                            </button>
+                        </div>
+                    </form>
+
+                    <div id="resultadoCalculo" class="mt-4 d-none">
+                        <div class="alert alert-success mb-0 text-center border-success" style="background-color: #f0fdf4;">
+                            <h6 class="mb-1 text-success text-uppercase small fw-bold">Valor a Pagar:</h6>
+                            <h2 class="fw-bold mb-1 text-success" id="valorFinalDisplay">0,00 €</h2>
+                            <span class="badge bg-success bg-opacity-25 text-success" id="detalhesCalculoDisplay">
+                                0 dias x 6h x 0€/h
+                            </span>
+                        </div>
+                    </div>
+
+                </div>
             </div>
         </div>
     </div>
-</div>
     <!--Modal para a atribuição de nova alocação do Formador-->
     <div class="modal fade" id="modalAdicionarAlocacao" tabindex="-1" aria-labelledby="modalAdicionarAlocacaoLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -571,7 +573,7 @@
                             </div>
                             <div class="col-sm-6 mb-3">
                                 <label for="dataFim" class="form-label fw-bold">Data de Fim:</label>
-                                <input type="date" class="form-control" id="dataFim" name="dataFim" value="@dataReferencia.ToString("yyyy-MM-dd")"  required>
+                                <input type="date" class="form-control" id="dataFim" name="dataFim" value="@dataReferencia.ToString("yyyy-MM-dd")" required>
                             </div>
                         </div>
                     </div>
@@ -625,7 +627,7 @@
 
                     // 3. Fazer o pedido AJAX
                     $.ajax({
-                        url: '/Funcionarios/RemoverAssociacao', 
+                        url: '/Funcionarios/RemoverAssociacao',
                         type: 'POST',
                         data: {
                             formadorId: formadorId,
@@ -649,7 +651,7 @@
                                         }
                                     });
                                 }
-                            } 
+                            }
                         },
                         error: function () {
                             alert('Ocorreu um erro ao tentar comunicar com o servidor.');
@@ -658,11 +660,11 @@
                             btnSubmit.html(textoOriginal).prop('disabled', false);
                         }
                     });
-                }); 
+                });
 
-            }); 
+            });
             
-        } 
+        }
     </script>
 
     <script>
