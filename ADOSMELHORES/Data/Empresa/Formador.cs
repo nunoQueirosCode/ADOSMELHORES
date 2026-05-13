@@ -7,6 +7,7 @@ namespace ADOSMELHORES.Data.Empresa
         public enum Disponibilidade
         {
             Laboral,
+            [Display(Name = "Pós-Laboral")]
             PosLaboral,
             Ambas
         }

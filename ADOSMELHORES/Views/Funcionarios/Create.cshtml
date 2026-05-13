@@ -70,7 +70,7 @@
                         <select id="SelectTipoFuncionario" asp-for="TipoFuncionario" class="form-select form-select-lg border-primary">
                             <option value="">-- Selecione um cargo --</option>
                             <option value="Diretor">Diretor</option>
-                            <option value="Secretaria">Secretaria</option>
+                            <option value="Secretaria">Secretária</option>
                             <option value="Formador">Formador</option>
                             <option value="Coordenador">Coordenador</option>
                         </select>
@@ -114,7 +114,7 @@
                     <div id="SecaoFormador" class="secao-especifica d-none">
                         <h5 class="text-primary mb-3">Detalhes de Formação</h5>
                         <div class="mb-3">
-                            <label class="form-label fw-bold">Reporta ao Diretor:</label>
+                            <label class="form-label fw-bold">Reporta ao Coordenador:</label>
                             <select asp-for="CoordenadorId" class="form-select" asp-items="@Model.ListaCoordenadores">
                             </select>
                             <span asp-validation-for="CoordenadorId" class="text-danger"></span>
@@ -169,27 +169,29 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
-            $('#SelectTipoFuncionario').change(function () {
-                // Esconder todas as secções primeiro
+            
+            function atualizarVisibilidadeSecoes() {
                 $('.secao-especifica').addClass('d-none');
                 $('#SecaoVazia').addClass('d-none');
 
-                // Obter o valor selecionado
-                var tipo = $(this).val();
+                var tipo = $('#SelectTipoFuncionario').val();
 
-                if (tipo === "") {
+                if (!tipo || tipo === "") {
                     $('#SecaoVazia').removeClass('d-none');
                 } else {
-                    // Mostrar a secção correspondente
                     $('#Secao' + tipo).removeClass('d-none');
-                    if(tipo == "Formador") {
-						$('#SalarioBase').attr("disabled", true).val("");
-					}
-					else {
-						$('#SalarioBase').attr("disabled", false);
+                    
+                    if (tipo === "Formador") {
+                        $('#SalarioBase').attr("disabled", true).val("");
+                    } else {
+                        $('#SalarioBase').attr("disabled", false);
                     }
                 }
-            });
+            }
+
+            $('#SelectTipoFuncionario').change(atualizarVisibilidadeSecoes);
+
+            atualizarVisibilidadeSecoes();
         });
     </script>
 }

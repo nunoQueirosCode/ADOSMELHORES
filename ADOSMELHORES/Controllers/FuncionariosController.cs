@@ -26,7 +26,7 @@ namespace ADOSMELHORES.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return RedirectToAction(nameof (Index));
             }
             var funcionarios = await ObterFuncionariosDaCache();
 
@@ -34,7 +34,7 @@ namespace ADOSMELHORES.Controllers
 
             if (funcionario == null)
             {
-                return NotFound();
+                return RedirectToAction(nameof(Index));
             }
 
             return View(funcionario);
@@ -157,7 +157,8 @@ namespace ADOSMELHORES.Controllers
 
             var funcionario = funcionarios.FirstOrDefault(a => a.Id == id);
 
-            if (funcionario == null) return NotFound();
+            if (funcionario == null) return RedirectToAction(nameof(Index));
+
 
             funcionario.DataRegistoCriminal = novaDataRegisto;
 
@@ -166,7 +167,7 @@ namespace ADOSMELHORES.Controllers
 
             _cache.Remove(CacheKeys.ListaFuncionarios);
 
-            return RedirectToAction(nameof(Details), new {id = funcionario.Id}); 
+            return Json(new { sucesso = true});
         }
 
         [HttpPost]
@@ -184,7 +185,7 @@ namespace ADOSMELHORES.Controllers
 
             var funcionario = funcionarios.FirstOrDefault(a => a.Id == id);
 
-            if (funcionario == null) return NotFound();
+            if (funcionario == null) return RedirectToAction(nameof(Index));
 
             funcionario.DataFimContrato = novaDataContrato;
 
@@ -193,13 +194,13 @@ namespace ADOSMELHORES.Controllers
 
             _cache.Remove(CacheKeys.ListaFuncionarios);
 
-            return RedirectToAction(nameof(Details), new { id = funcionario.Id });
+            return Json(new { sucesso = true });
         }
 
         [HttpGet]
         public async Task<IActionResult> Edit(Guid? id)
         {
-            if (id == null) return NotFound();
+            if (id == null) return RedirectToAction(nameof(Index));
 
             var funcionarios = await ObterFuncionariosDaCache();
 
@@ -207,7 +208,7 @@ namespace ADOSMELHORES.Controllers
 
             DateTime dataAtualSistema = ObterDataDoSistema();
 
-            if (funcionario == null) return NotFound();
+            if (funcionario == null) return RedirectToAction(nameof(Index));
 
             var model = new FuncionarioViewModel
             {
@@ -257,7 +258,7 @@ namespace ADOSMELHORES.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Guid id, FuncionarioViewModel model)
         {
-            if (id != model.Id) return NotFound();
+            if (id != model.Id) return RedirectToAction(nameof(Index));
 
             if (ModelState.IsValid)
             {
@@ -265,7 +266,7 @@ namespace ADOSMELHORES.Controllers
 
                 var funcionarioExistente = funcionarios.FirstOrDefault(a => a.Id == id);
 
-                if (funcionarioExistente == null) return NotFound();
+                if (funcionarioExistente == null) return RedirectToAction(nameof(Index));
 
                 funcionarioExistente.Nome = model.Nome;
                 funcionarioExistente.Morada = model.Morada;
@@ -308,7 +309,7 @@ namespace ADOSMELHORES.Controllers
                 catch (DbUpdateConcurrencyException)
                 {
                     if (!funcionarios.Any(e => e.Id == id))
-                        return NotFound();
+                        return RedirectToAction(nameof(Index));
                     else
                         throw;
                 }
@@ -406,7 +407,7 @@ namespace ADOSMELHORES.Controllers
                 return Json(new { sucesso = false, mensagem = "A Data de Fim não pode ser anterior à Data de Início." });
             }
 
-            if (id == null) return NotFound();
+            if (id == null) return RedirectToAction(nameof(Index));
 
             var funcionarios = await ObterFuncionariosDaCache();
 
@@ -434,7 +435,7 @@ namespace ADOSMELHORES.Controllers
         {
             try
             {
-                if (formadorId == null || coordenadorId == null) return NotFound();
+                if (formadorId == null || coordenadorId == null) return RedirectToAction(nameof(Index));
 
                 var funcionarios = await ObterFuncionariosDaCache();
 
