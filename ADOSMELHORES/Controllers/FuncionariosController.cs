@@ -88,7 +88,7 @@ namespace ADOSMELHORES.Controllers
                         {
                             Salario = model.Salario,
                             Area = model.Area,
-                            DiretorId = (Guid)model.DiretorId
+                            DiretorId = model.DiretorId == null ? null : model.DiretorId
                         };
                         break;
                     case "Formador":
