@@ -169,27 +169,29 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
-            $('#SelectTipoFuncionario').change(function () {
-                // Esconder todas as secções primeiro
+            
+            function atualizarVisibilidadeSecoes() {
                 $('.secao-especifica').addClass('d-none');
                 $('#SecaoVazia').addClass('d-none');
 
-                // Obter o valor selecionado
-                var tipo = $(this).val();
+                var tipo = $('#SelectTipoFuncionario').val();
 
-                if (tipo === "") {
+                if (!tipo || tipo === "") {
                     $('#SecaoVazia').removeClass('d-none');
                 } else {
-                    // Mostrar a secção correspondente
                     $('#Secao' + tipo).removeClass('d-none');
-                    if(tipo == "Formador") {
-						$('#SalarioBase').attr("disabled", true).val("");
-					}
-					else {
-						$('#SalarioBase').attr("disabled", false);
+                    
+                    if (tipo === "Formador") {
+                        $('#SalarioBase').attr("disabled", true).val("");
+                    } else {
+                        $('#SalarioBase').attr("disabled", false);
                     }
                 }
-            });
+            }
+
+            $('#SelectTipoFuncionario').change(atualizarVisibilidadeSecoes);
+
+            atualizarVisibilidadeSecoes();
         });
     </script>
 }
