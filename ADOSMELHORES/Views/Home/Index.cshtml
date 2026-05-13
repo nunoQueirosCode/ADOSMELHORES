@@ -6,9 +6,14 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
         <h2 style="color: var(--azul-conhecimento); font-weight: 700; margin-bottom: 0;">Visão Geral</h2>
-        <span class="text-muted">Resumo de Ativos e Recursos Humanos da ADOSMELHORES</span>
+        <span class="text-muted">Resumo de Recursos Humanos da ADOSMELHORES</span>
     </div>
-
+    
+    <div>
+        <a asp-action="ExportarCSV" asp-controller="Home" class="btn btn-success shadow-sm fw-bold">
+            <i class="fa-solid fa-file-csv me-2"></i>Exportar Dados
+        </a>
+    </div>
 </div>
 
 <div class="row g-4 mb-4">

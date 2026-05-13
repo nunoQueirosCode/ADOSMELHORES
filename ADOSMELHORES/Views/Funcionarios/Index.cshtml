@@ -46,10 +46,16 @@
         <h2 style="color: var(--azul-conhecimento); font-weight: 700; margin-bottom: 0;">Funcionários</h2>
         <span class="text-muted">Gere a equipa e formadores da empresa</span>
     </div>
-    <a asp-action="Create" class="btn btn-ados">
-        <i class="fa-solid fa-user-plus me-2"></i>Novo Funcionário
-    </a>
+    <div>
+        <a asp-action="Create" class="btn btn-ados">
+            <i class="fa-solid fa-user-plus me-2"></i>Novo Funcionário
+        </a>
+        <a asp-action="ExportarCSV" asp-controller="Home" class="btn btn-success shadow-sm fw-bold">
+                <i class="fa-solid fa-file-csv me-2"></i>Exportar Dados
+         </a>
+     </div>
 </div>
+
 
 <div class="card card-ados">
     <div class="card-body p-4">
