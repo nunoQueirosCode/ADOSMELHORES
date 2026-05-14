@@ -33,12 +33,12 @@
                     @foreach (var alocacao in Model)
                     {
                         <tr>
-                            <td>@alocacao.DescricaoFormacao</td>
                             <td>
                                 <div class="fw-bold text-dark">
-                                    @(alocacao.Formador?.Nome ?? "Formador removido")
+                                    @alocacao.DescricaoFormacao
                                 </div>
                             </td>
+                            <td>@(alocacao.Formador?.Nome ?? "Formador removido")</td>
                             <td>@alocacao.DataInicio.ToString("dd/MM/yyyy")</td>
                             <td>@alocacao.DataFim.ToString("dd/MM/yyyy")</td>
                             <td class="text-end">
@@ -102,7 +102,7 @@
                      "<'row'<'col-sm-12'tr>>" +
                      "<'row mt-3'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
                 columnDefs: [
-                    { orderable: false, targets: 3 }
+                    { orderable: false, targets: 4 }
                 ],
                 order: [[0, 'asc']],
                 pageLength: 10,

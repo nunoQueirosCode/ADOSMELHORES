@@ -6,21 +6,15 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using static ADOSMELHORES.Data.Empresa.Formador;
 
 namespace ADOSMELHORES.Controllers
 {
-    public class FuncionariosController : Controller
+    public class FuncionariosController : BaseController
     {
-        private readonly EmpresaContext _context;
-        private readonly IMemoryCache _cache;
-
-        public FuncionariosController(EmpresaContext context, IMemoryCache cache)
-        {
-            _context = context;
-            _cache = cache;
-        }
+        public FuncionariosController(EmpresaContext context, IMemoryCache cache) : base(context, cache) { }
 
         public async Task<IActionResult> Index()
         {
@@ -32,7 +26,7 @@ namespace ADOSMELHORES.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return RedirectToAction(nameof (Index));
             }
             var funcionarios = await ObterFuncionariosDaCache();
 
@@ -40,7 +34,7 @@ namespace ADOSMELHORES.Controllers
 
             if (funcionario == null)
             {
-                return NotFound();
+                return RedirectToAction(nameof(Index));
             }
 
             return View(funcionario);
@@ -51,13 +45,17 @@ namespace ADOSMELHORES.Controllers
         {
             var model = new FuncionarioViewModel();
 
+            DateTime dataAtualSistema = ObterDataDoSistema();
+
             var funcionarios = await ObterFuncionariosDaCache();
 
             model.ListaDiretores = funcionarios.OfType<Diretor>()
+                .Where(d => d.DataFimContrato > dataAtualSistema)
                 .Select(d => new SelectListItem { Value = d.Id.ToString(), Text = d.Nome })
                 .ToList();
 
             model.ListaCoordenadores = funcionarios.OfType<Coordenador>()
+                .Where(c => c.DataFimContrato > dataAtualSistema)
                 .Select(c => new SelectListItem { Value = c.Id.ToString(), Text = c.Nome })
                 .ToList();
 
@@ -88,7 +86,7 @@ namespace ADOSMELHORES.Controllers
                         {
                             Salario = model.Salario,
                             Area = model.Area,
-                            DiretorId = (Guid)model.DiretorId
+                            DiretorId = model.DiretorId == null ? null : model.DiretorId
                         };
                         break;
                     case "Formador":
@@ -129,11 +127,15 @@ namespace ADOSMELHORES.Controllers
 
             var funcionarios = await ObterFuncionariosDaCache();
 
+            DateTime dataAtualSistema = ObterDataDoSistema();
+
             model.ListaDiretores = funcionarios.OfType<Diretor>()
-                .Select(d => new SelectListItem { Value = d.Id.ToString(), Text = d.Nome })
-                .ToList();
+               .Where(d => d.DataFimContrato > dataAtualSistema)
+               .Select(d => new SelectListItem { Value = d.Id.ToString(), Text = d.Nome })
+               .ToList();
 
             model.ListaCoordenadores = funcionarios.OfType<Coordenador>()
+                .Where(c => c.DataFimContrato > dataAtualSistema)
                 .Select(c => new SelectListItem { Value = c.Id.ToString(), Text = c.Nome })
                 .ToList();
 
@@ -155,7 +157,8 @@ namespace ADOSMELHORES.Controllers
 
             var funcionario = funcionarios.FirstOrDefault(a => a.Id == id);
 
-            if (funcionario == null) return NotFound();
+            if (funcionario == null) return RedirectToAction(nameof(Index));
+
 
             funcionario.DataRegistoCriminal = novaDataRegisto;
 
@@ -164,7 +167,7 @@ namespace ADOSMELHORES.Controllers
 
             _cache.Remove(CacheKeys.ListaFuncionarios);
 
-            return RedirectToAction(nameof(Details), new {id = funcionario.Id}); 
+            return Json(new { sucesso = true});
         }
 
         [HttpPost]
@@ -182,7 +185,7 @@ namespace ADOSMELHORES.Controllers
 
             var funcionario = funcionarios.FirstOrDefault(a => a.Id == id);
 
-            if (funcionario == null) return NotFound();
+            if (funcionario == null) return RedirectToAction(nameof(Index));
 
             funcionario.DataFimContrato = novaDataContrato;
 
@@ -191,19 +194,21 @@ namespace ADOSMELHORES.Controllers
 
             _cache.Remove(CacheKeys.ListaFuncionarios);
 
-            return RedirectToAction(nameof(Details), new { id = funcionario.Id });
+            return Json(new { sucesso = true });
         }
 
         [HttpGet]
         public async Task<IActionResult> Edit(Guid? id)
         {
-            if (id == null) return NotFound();
+            if (id == null) return RedirectToAction(nameof(Index));
 
             var funcionarios = await ObterFuncionariosDaCache();
 
             var funcionario = funcionarios.FirstOrDefault(a => a.Id == id);
 
-            if (funcionario == null) return NotFound();
+            DateTime dataAtualSistema = ObterDataDoSistema();
+
+            if (funcionario == null) return RedirectToAction(nameof(Index));
 
             var model = new FuncionarioViewModel
             {
@@ -213,8 +218,8 @@ namespace ADOSMELHORES.Controllers
                 Contacto = funcionario.Contacto,
                 DataFimContrato = funcionario.DataFimContrato,
                 DataRegistoCriminal = funcionario.DataRegistoCriminal,
-                ListaDiretores = _context.Diretores.Select(d => new SelectListItem { Value = d.Id.ToString(), Text = d.Nome }).ToList(),
-                ListaCoordenadores = _context.Coordenadores.Select(c => new SelectListItem { Value = c.Id.ToString(), Text = c.Nome }).ToList()
+                ListaDiretores = funcionarios.OfType<Diretor>().Where(d => d.DataFimContrato > dataAtualSistema).Select(d => new SelectListItem { Value = d.Id.ToString(), Text = d.Nome }).ToList(),
+                ListaCoordenadores = funcionarios.OfType<Coordenador>().Where(d => d.DataFimContrato > dataAtualSistema).Select(c => new SelectListItem { Value = c.Id.ToString(), Text = c.Nome }).ToList()
             };
 
             if (funcionario is Diretor diretor)
@@ -253,7 +258,7 @@ namespace ADOSMELHORES.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Guid id, FuncionarioViewModel model)
         {
-            if (id != model.Id) return NotFound();
+            if (id != model.Id) return RedirectToAction(nameof(Index));
 
             if (ModelState.IsValid)
             {
@@ -261,7 +266,7 @@ namespace ADOSMELHORES.Controllers
 
                 var funcionarioExistente = funcionarios.FirstOrDefault(a => a.Id == id);
 
-                if (funcionarioExistente == null) return NotFound();
+                if (funcionarioExistente == null) return RedirectToAction(nameof(Index));
 
                 funcionarioExistente.Nome = model.Nome;
                 funcionarioExistente.Morada = model.Morada;
@@ -279,7 +284,7 @@ namespace ADOSMELHORES.Controllers
                 else if (funcionarioExistente is Secretaria secretaria)
                 {
                     secretaria.Area = model.Area;
-                    secretaria.DiretorId = (Guid)model.DiretorId;
+                    secretaria.DiretorId = model.DiretorId == null ? null : model.DiretorId;
                     secretaria.Salario = model.Salario;
                 }
                 else if (funcionarioExistente is Formador formador)
@@ -304,7 +309,7 @@ namespace ADOSMELHORES.Controllers
                 catch (DbUpdateConcurrencyException)
                 {
                     if (!funcionarios.Any(e => e.Id == id))
-                        return NotFound();
+                        return RedirectToAction(nameof(Index));
                     else
                         throw;
                 }
@@ -313,8 +318,10 @@ namespace ADOSMELHORES.Controllers
             }
             var listaFuncionarios = await ObterFuncionariosDaCache();
 
-            model.ListaDiretores = listaFuncionarios.OfType<Diretor>().Select(d => new SelectListItem { Value = d.Id.ToString(), Text = d.Nome }).ToList();
-            model.ListaCoordenadores = listaFuncionarios.OfType<Coordenador>().Select(c => new SelectListItem { Value = c.Id.ToString(), Text = c.Nome }).ToList();
+            DateTime dataAtualSistema = ObterDataDoSistema();
+
+            model.ListaDiretores = listaFuncionarios.OfType<Diretor>().Where(d => d.DataFimContrato > dataAtualSistema).Select(d => new SelectListItem { Value = d.Id.ToString(), Text = d.Nome }).ToList();
+            model.ListaCoordenadores = listaFuncionarios.OfType<Coordenador>().Where(d => d.DataFimContrato > dataAtualSistema).Select(c => new SelectListItem { Value = c.Id.ToString(), Text = c.Nome }).ToList();
 
             return View(model);
         }
@@ -359,7 +366,13 @@ namespace ADOSMELHORES.Controllers
         {
             DateTime dataAtualSistema = ObterDataDoSistema();
 
-            if (dataFim < dataInicio)
+            if (descricao.IsNullOrEmpty())
+            {
+                return Json(new { sucesso = false, mensagem = "A descrição é obrigatória." });
+            }
+
+
+            if (dataFim <= dataInicio)
             {
                 return Json(new { sucesso = false, mensagem = "A Data de Fim não pode ser anterior à Data de Início." });
             }
@@ -394,7 +407,7 @@ namespace ADOSMELHORES.Controllers
                 return Json(new { sucesso = false, mensagem = "A Data de Fim não pode ser anterior à Data de Início." });
             }
 
-            if (id == null) return NotFound();
+            if (id == null) return RedirectToAction(nameof(Index));
 
             var funcionarios = await ObterFuncionariosDaCache();
 
@@ -422,7 +435,7 @@ namespace ADOSMELHORES.Controllers
         {
             try
             {
-                if (formadorId == null || coordenadorId == null) return NotFound();
+                if (formadorId == null || coordenadorId == null) return RedirectToAction(nameof(Index));
 
                 var funcionarios = await ObterFuncionariosDaCache();
 
@@ -444,105 +457,5 @@ namespace ADOSMELHORES.Controllers
                 return Json(new { sucesso = false, mensagem = "Erro interno do servidor: " + ex.Message });
             }
         }
-
-        [HttpGet]
-        public async Task<IActionResult> ExportarCSV()
-        {
-            var funcionarios = await _context.Funcionarios.ToListAsync();
-
-            if (!funcionarios.Any())
-            {
-                return BadRequest("Não há funcionários para exportar.");
-            }
-
-            var csv = new StringBuilder();
-
-            // Cabeçalho do CSV
-            csv.AppendLine("Id,Nome,Morada,Contacto,Tipo,DataFimContrato,DataRegistoCriminal,Salario,Area,AreaLecionada,ValorHora,IsencaoHorario,BonusMensal,CarroEmpresa,TipoDisponibilidade,DiretorId,CoordenadorId");
-
-            // Linhas de dados
-            foreach (var funcionario in funcionarios)
-            {
-                var tipo = funcionario.GetType().Name;
-                var salario = "null";
-                var area = "null";
-                var areaLecionada = "null";
-                var valorHora = "null";
-                var isencaoHorario = "null";
-                var bonusMensal = "null";
-                var carroEmpresa = "null";
-                var tipoDisponibilidade = "null";
-                var diretorId = "null";
-                var coordenadorId = "null";
-
-                if (funcionario is Diretor d)
-                {
-                    salario = d.Salario.ToString("F2");
-                    isencaoHorario = d.IsencaoHorario.ToString();
-                    bonusMensal = d.BonusMensal.HasValue ? d.BonusMensal.Value.ToString("F2") : "null";
-                    carroEmpresa = d.CarroEmpresa.ToString();
-                }
-                else if (funcionario is Secretaria s)
-                {
-                    salario = s.Salario.ToString("F2");
-                    area = s.Area;
-                    diretorId = s.DiretorId.ToString() ?? "null";
-                }
-                else if (funcionario is Formador f)
-                {
-                    areaLecionada = f.AreaLecionada;
-                    valorHora = f.ValorHora.ToString("F2");
-                    tipoDisponibilidade = f.TipoDisponibilidade.ToString();
-                    coordenadorId = f.CoordenadorId?.ToString() ?? "null";
-                }
-                else if (funcionario is Coordenador c)
-                {
-                    salario = c.Salario.ToString("F2");
-                }
-
-                var linha = $"\"{funcionario.Id}\",\"{funcionario.Nome}\",\"{funcionario.Morada}\"," +
-                    $"\"{funcionario.Contacto}\",\"{tipo}\",\"{funcionario.DataFimContrato:yyyy-MM-dd}\"," +
-                    $"\"{funcionario.DataRegistoCriminal:yyyy-MM-dd}\",\"{salario}\",\"{area}\"," +
-                    $"\"{areaLecionada}\",\"{valorHora}\",\"{isencaoHorario}\",\"{bonusMensal}\"," +
-                    $"\"{carroEmpresa}\",\"{tipoDisponibilidade}\",\"{diretorId}\",\"{coordenadorId}\"";
-
-                csv.AppendLine(linha);
-            }
-
-            var conteudo = Encoding.UTF8.GetBytes(csv.ToString());
-            return File(conteudo, "text/csv", $"Funcionarios_{DateTime.Now:yyyyMMdd_HHmmss}.csv");
-        }
-        private async Task<List<Funcionario>> ObterFuncionariosDaCache()
-        {
-            if (!_cache.TryGetValue(CacheKeys.ListaFuncionarios, out List<Funcionario> funcionarios))
-            {
-                funcionarios = await _context.Funcionarios.Include("Alocacoes").ToListAsync();
-
-                _cache.Set(CacheKeys.ListaFuncionarios, funcionarios);
-            }
-
-            return funcionarios;
-        }
-        protected DateTime ObterDataDoSistema()
-        {
-            string dataCookie = Request.Cookies["DataSistema"];
-            DateTime dataAtualDoSistema;
-
-            if (string.IsNullOrEmpty(dataCookie) || !DateTime.TryParse(dataCookie, out dataAtualDoSistema))
-            {
-                dataAtualDoSistema = DateTime.Today;
-
-                CookieOptions options = new CookieOptions
-                {
-                    Expires = DateTime.Now.AddMinutes(30),
-                    HttpOnly = true
-                };
-
-                Response.Cookies.Append("DataSistema", dataAtualDoSistema.ToString("yyyy-MM-dd"), options);
-            }
-
-            return dataAtualDoSistema;
-        }
-
     }
 }

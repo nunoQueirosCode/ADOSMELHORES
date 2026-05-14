@@ -7,16 +7,9 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace ADOSMELHORES.Controllers
 {
-    public class AlocacaoController : Controller
+    public class AlocacaoController : BaseController
     {
-        private readonly EmpresaContext _context;
-        private readonly IMemoryCache _cache;
-        
-        public AlocacaoController(EmpresaContext context, IMemoryCache cache)
-        {
-            _context = context;
-            _cache = cache;
-        }
+        public AlocacaoController(EmpresaContext context, IMemoryCache cache) : base(context, cache) { }
         public async Task<IActionResult> Index()
         {
             var funcionarios = await ObterFuncionariosDaCache();
@@ -59,17 +52,6 @@ namespace ADOSMELHORES.Controllers
             {
                 return Json(new { sucesso = false, mensagem = "Erro ao eliminar alocação: " + ex.Message });
             }
-        }
-        private async Task<List<Funcionario>> ObterFuncionariosDaCache()
-        {
-            if (!_cache.TryGetValue(CacheKeys.ListaFuncionarios, out List<Funcionario> funcionarios))
-            {
-                funcionarios = await _context.Funcionarios.Include("Alocacoes").ToListAsync();
-
-                _cache.Set(CacheKeys.ListaFuncionarios, funcionarios);
-            }
-
-            return funcionarios;
         }
     }
 }

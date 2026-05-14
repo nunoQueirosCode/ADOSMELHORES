@@ -6,9 +6,14 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
         <h2 style="color: var(--azul-conhecimento); font-weight: 700; margin-bottom: 0;">Visão Geral</h2>
-        <span class="text-muted">Resumo de Ativos e Recursos Humanos da ADOSMELHORES</span>
+        <span class="text-muted">Resumo de Recursos Humanos da ADOSMELHORES</span>
     </div>
-
+    
+    <div>
+        <a asp-action="ExportarCSV" asp-controller="Home" class="btn btn-success shadow-sm fw-bold">
+            <i class="fa-solid fa-file-csv me-2"></i>Exportar Dados
+        </a>
+    </div>
 </div>
 
 <div class="row g-4 mb-4">
@@ -95,6 +100,10 @@
             <div class="card-body d-flex justify-content-center align-items-center">
                 <canvas id="graficoCargos" style="max-height: 250px;"></canvas>
             </div>
+            <div class="text-center text-muted mb-2" style="font-size: 0.85rem;">
+                <i class="fa-solid fa-circle-info me-1"></i>
+                Distribuição do gasto salarial e de honorários por tipo de funcionário.
+            </div>
         </div>
     </div>
 
@@ -136,7 +145,6 @@
                                         </td>
                                     </tr>
                                 }
-                            }
                         </tbody>
                     </table>
                 </div>
@@ -190,6 +198,9 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     cutout: '70%',
+                    layout:{
+                        padding: 15
+                    },
                     plugins: {
                         legend: {
                             position: 'right',
