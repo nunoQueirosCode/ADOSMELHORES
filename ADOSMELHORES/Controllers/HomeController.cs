@@ -97,35 +97,35 @@ namespace ADOSMELHORES.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        public async Task<IActionResult> CalcularDespesaMensal()
-        {
+        //public async Task<IActionResult> CalcularDespesaMensal()
+        //{
    
-            DateTime dataAtualDoSistema = ObterDataDoSistema();
+        //    DateTime dataAtualDoSistema = ObterDataDoSistema();
 
-            var funcionarios = await ObterFuncionariosDaCache();
+        //    var funcionarios = await ObterFuncionariosDaCache();
 
-            var model = new HomeDashboardViewModel();
+        //    var model = new HomeDashboardViewModel();
 
-            model.TotalDiretores = funcionarios.OfType<Diretor>().Sum(d => d.Salario + (d.BonusMensal ?? 0));
-            model.TotalSecretarias = funcionarios.OfType<Secretaria>().Sum(s => s.Salario);
-            model.TotalCoordenadores = funcionarios.OfType<Coordenador>().Sum(c => c.Salario);
+        //    model.TotalDiretores = funcionarios.OfType<Diretor>().Sum(d => d.Salario + (d.BonusMensal ?? 0));
+        //    model.TotalSecretarias = funcionarios.OfType<Secretaria>().Sum(s => s.Salario);
+        //    model.TotalCoordenadores = funcionarios.OfType<Coordenador>().Sum(c => c.Salario);
 
-            DateTime inicioDoMes = new DateTime(dataAtualDoSistema.Year, dataAtualDoSistema.Month, 1);
-            DateTime fimDoMes = inicioDoMes.AddMonths(1).AddDays(-1);
+        //    DateTime inicioDoMes = new DateTime(dataAtualDoSistema.Year, dataAtualDoSistema.Month, 1);
+        //    DateTime fimDoMes = inicioDoMes.AddMonths(1).AddDays(-1);
 
-            model.TotalFormadores = funcionarios.OfType<Formador>().Sum(f => f.Alocacoes?
-                .Where(a => a.DataInicio <= fimDoMes && a.DataFim >= inicioDoMes)
-                .Sum(a => {DateTime dataCalculoInicio = a.DataInicio < inicioDoMes ? inicioDoMes : a.DataInicio;
-                           DateTime dataCalculoFim = a.DataFim > fimDoMes ? fimDoMes : a.DataFim;
-                           return ContarDiasUteis(dataCalculoInicio, dataCalculoFim) * 6 * f.ValorHora;
-                           }) ?? 0);
+        //    model.TotalFormadores = funcionarios.OfType<Formador>().Sum(f => f.Alocacoes?
+        //        .Where(a => a.DataInicio <= fimDoMes && a.DataFim >= inicioDoMes)
+        //        .Sum(a => {DateTime dataCalculoInicio = a.DataInicio < inicioDoMes ? inicioDoMes : a.DataInicio;
+        //                   DateTime dataCalculoFim = a.DataFim > fimDoMes ? fimDoMes : a.DataFim;
+        //                   return ContarDiasUteis(dataCalculoInicio, dataCalculoFim) * 6 * f.ValorHora;
+        //                   }) ?? 0);
 
-            model.TotalGeral = model.TotalDiretores + model.TotalSecretarias + model.TotalCoordenadores + model.TotalFormadores;
+        //    model.TotalGeral = model.TotalDiretores + model.TotalSecretarias + model.TotalCoordenadores + model.TotalFormadores;
 
-            model.QtdFuncionarios = funcionarios.Count;
+        //    model.QtdFuncionarios = funcionarios.Count;
 
-            return View(model);
-        }
+        //    return View(model);
+        //}
 
         private int ContarDiasUteis(DateTime inicio, DateTime fim)
         {
