@@ -51,7 +51,7 @@ namespace ADOSMELHORES.Controllers
                 f.DataFimContrato >= dataAtualDoSistema &&
                 f.DataFimContrato <= dataAtualDoSistema.AddDays(30));
 
-            model.QtdFuncionariosRegistoCriminal = funcionarios.Count(f => f.DataRegistoCriminal < dataAtualDoSistema);
+            model.QtdFuncionariosRegistoCriminal = funcionarios.Count(f => f.DataRegistoCriminal < dataAtualDoSistema && f.DataFimContrato >= dataAtualDoSistema);
 
             model.QtdDiretores = funcionarios.OfType<Diretor>().Count();
             model.QtdCoordenadores = funcionarios.OfType<Coordenador>().Count();
