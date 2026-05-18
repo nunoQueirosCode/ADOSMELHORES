@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ADOSMELHORES.Migrations
 {
     /// <inheritdoc />
-    public partial class first : Migration
+    public partial class initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -17,7 +17,7 @@ namespace ADOSMELHORES.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Nome = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Morada = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Morada = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Contacto = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DataFimContrato = table.Column<DateTime>(type: "datetime2", nullable: false),
                     DataRegistoCriminal = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -58,7 +58,6 @@ namespace ADOSMELHORES.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     FormadorId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    ValorHoraNoMomento = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     DescricaoFormacao = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DataInicio = table.Column<DateTime>(type: "datetime2", nullable: false),
                     DataFim = table.Column<DateTime>(type: "datetime2", nullable: false)

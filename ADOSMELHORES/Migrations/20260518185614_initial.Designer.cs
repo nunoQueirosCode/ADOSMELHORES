@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ADOSMELHORES.Migrations
 {
     [DbContext(typeof(EmpresaContext))]
-    [Migration("20260512135959_first")]
-    partial class first
+    [Migration("20260518185614_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -44,9 +44,6 @@ namespace ADOSMELHORES.Migrations
                     b.Property<Guid?>("FormadorId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<decimal>("ValorHoraNoMomento")
-                        .HasColumnType("decimal(18,2)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("FormadorId");
@@ -71,7 +68,6 @@ namespace ADOSMELHORES.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Morada")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Nome")

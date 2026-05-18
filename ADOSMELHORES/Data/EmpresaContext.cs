@@ -60,71 +60,70 @@ namespace ADOSMELHORES.Data
                 .HasForeignKey(alocacao => alocacao.FormadorId)
                 .OnDelete(DeleteBehavior.SetNull); // <---  apenas limpa o ID
 
-            //// DATA SEEDING
+            // DATA SEEDING
 
-            //// Guids fixos para podermos usar nas chaves estrangeiras
-            //var diretorId = Guid.Parse("11111111-1111-1111-1111-111111111111");
-            //var coordenadorId = Guid.Parse("22222222-2222-2222-2222-222222222222");
-            //var secretariaId = Guid.Parse("33333333-3333-3333-3333-333333333333");
-            //var formadorId = Guid.Parse("44444444-4444-4444-4444-444444444444");
-            //var alocacaoId = Guid.Parse("55555555-5555-5555-5555-555555555555");
+            // Guids fixos para podermos usar nas chaves estrangeiras
+            var diretorId = Guid.Parse("11111111-1111-1111-1111-111111111111");
+            var coordenadorId = Guid.Parse("22222222-2222-2222-2222-222222222222");
+            var secretariaId = Guid.Parse("33333333-3333-3333-3333-333333333333");
+            var formadorId = Guid.Parse("44444444-4444-4444-4444-444444444444");
+            var alocacaoId = Guid.Parse("55555555-5555-5555-5555-555555555555");
 
-            //modelBuilder.Entity<Diretor>().HasData(new Diretor
-            //{
-            //    Id = diretorId,
-            //    Nome = "Mário Oliveira",
-            //    Contacto = "912345678",
-            //    DataFimContrato = new DateTime(2028, 12, 31),
-            //    DataRegistoCriminal = new DateTime(2023, 5, 10),
-            //    IsencaoHorario = true,
-            //    Salario = 3500.00m,
-            //    CarroEmpresa = true
-            //});
+            modelBuilder.Entity<Diretor>().HasData(new Diretor
+            {
+                Id = diretorId,
+                Nome = "Mário Oliveira",
+                Contacto = "912345678",
+                DataFimContrato = new DateTime(2028, 12, 31),
+                DataRegistoCriminal = new DateTime(2023, 5, 10),
+                IsencaoHorario = true,
+                Salario = 3500.00m,
+                CarroEmpresa = true
+            });
 
-            //modelBuilder.Entity<Coordenador>().HasData(new Coordenador
-            //{
-            //    Id = coordenadorId,
-            //    Nome = "Nuno Queirós",
-            //    Contacto = "962345678",
-            //    DataFimContrato = new DateTime(2026, 6, 1),
-            //    DataRegistoCriminal = new DateTime(2023, 6, 15),
-            //    Salario = 2200.00m
-            //});
+            modelBuilder.Entity<Coordenador>().HasData(new Coordenador
+            {
+                Id = coordenadorId,
+                Nome = "Nuno Queirós",
+                Contacto = "962345678",
+                DataFimContrato = new DateTime(2026, 6, 1),
+                DataRegistoCriminal = new DateTime(2023, 6, 15),
+                Salario = 2200.00m
+            });
 
-            //modelBuilder.Entity<Secretaria>().HasData(new Secretaria
-            //{
-            //    Id = secretariaId,
-            //    DiretorId = diretorId,
-            //    Nome = "Bruna Buss",
-            //    Contacto = "932345678",
-            //    DataFimContrato = new DateTime(2026, 12, 31),
-            //    DataRegistoCriminal = new DateTime(2026, 8, 20),
-            //    Salario = 1100.00m,
-            //    Area = "Recursos Humanos"
-            //});
+            modelBuilder.Entity<Secretaria>().HasData(new Secretaria
+            {
+                Id = secretariaId,
+                DiretorId = diretorId,
+                Nome = "Bruna Buss",
+                Contacto = "932345678",
+                DataFimContrato = new DateTime(2026, 12, 31),
+                DataRegistoCriminal = new DateTime(2026, 8, 20),
+                Salario = 1100.00m,
+                Area = "Recursos Humanos"
+            });
 
-            //modelBuilder.Entity<Formador>().HasData(new Formador
-            //{
-            //    Id = formadorId,
-            //    CoordenadorId = coordenadorId,
-            //    Nome = "Jorge Dias",
-            //    Contacto = "919876543",
-            //    DataFimContrato = new DateTime(2026, 12, 31),
-            //    DataRegistoCriminal = new DateTime(2026, 9, 10),
-            //    AreaLecionada = "Programação C#",
-            //    ValorHora = 25.50m,
-            //    TipoDisponibilidade = Formador.Disponibilidade.Ambas
-            //});
+            modelBuilder.Entity<Formador>().HasData(new Formador
+            {
+                Id = formadorId,
+                CoordenadorId = coordenadorId,
+                Nome = "Jorge Dias",
+                Contacto = "919876543",
+                DataFimContrato = new DateTime(2026, 12, 31),
+                DataRegistoCriminal = new DateTime(2026, 9, 10),
+                AreaLecionada = "Programação C#",
+                ValorHora = 25.50m,
+                TipoDisponibilidade = Formador.Disponibilidade.Ambas
+            });
 
-            //modelBuilder.Entity<Alocacao>().HasData(new Alocacao
-            //{
-            //    Id = alocacaoId,
-            //    FormadorId = formadorId,
-            //    DescricaoFormacao = "Curso Intensivo de ASP.NET MVC",
-            //    ValorHoraNoMomento = 25.50m,
-            //    DataInicio = new DateTime(2026, 5, 1),
-            //    DataFim = new DateTime(2026, 5, 31)
-            //});
+            modelBuilder.Entity<Alocacao>().HasData(new Alocacao
+            {
+                Id = alocacaoId,
+                FormadorId = formadorId,
+                DescricaoFormacao = "Curso Intensivo de ASP.NET MVC",
+                DataInicio = new DateTime(2026, 5, 1),
+                DataFim = new DateTime(2026, 5, 31)
+            });
         }
     }
 }
