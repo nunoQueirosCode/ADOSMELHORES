@@ -18,7 +18,7 @@ namespace ADOSMELHORES.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var funcionarios = await ObterFuncionariosDaCache();
+            var funcionarios = await ObterFuncionariosDaCache(); // Obter a lista de funcionários do cache, ou do banco de dados se não estiver no cache
             return View(funcionarios);
         }
 
@@ -26,9 +26,9 @@ namespace ADOSMELHORES.Controllers
         {
             if (id == null)
             {
-                return RedirectToAction(nameof (Index));
+                return RedirectToAction(nameof (Index));  // Redirecionar para a ação Index se o ID for nulo, evitando erros de referência nula e garantindo que o usuário seja direcionado para uma página válida mesmo quando um ID inválido for fornecido
             }
-            var funcionarios = await ObterFuncionariosDaCache();
+            var funcionarios = await ObterFuncionariosDaCache(); 
 
             var funcionario = funcionarios.FirstOrDefault(a => a.Id == id);
 
@@ -37,13 +37,13 @@ namespace ADOSMELHORES.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            return View(funcionario);
+            return View(funcionario);  // Exibir a view de detalhes do funcionário encontrado, passando o objeto funcionário como modelo para a view, permitindo que as informações detalhadas do funcionário sejam apresentadas ao usuário
         }
 
         [HttpGet]
         public async Task<IActionResult> Create()
         {
-            var model = new FuncionarioViewModel();
+            var model = new FuncionarioViewModel();  // Criar uma instância do modelo de visualização FuncionarioViewModel para ser usado na view de criação de funcionário, permitindo que os dados necessários para criar um novo funcionário sejam coletados e validados na interface do usuário
 
             DateTime dataAtualSistema = ObterDataDoSistema();
 

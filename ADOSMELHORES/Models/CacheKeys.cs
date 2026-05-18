@@ -2,6 +2,6 @@
 {
     public static class CacheKeys
     {
-        public const string ListaFuncionarios = "ListaFuncionariosCache";
+        public const string ListaFuncionarios = "ListaFuncionariosCache"; 
     }
 }

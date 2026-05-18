@@ -21,10 +21,10 @@ namespace ADOSMELHORES.Controllers
 
         protected async Task<List<Funcionario>> ObterFuncionariosDaCache()
         {
-            if (!_cache.TryGetValue(CacheKeys.ListaFuncionarios, out List<Funcionario> funcionarios))
+            if (!_cache.TryGetValue(CacheKeys.ListaFuncionarios, out List<Funcionario> funcionarios))  // Tenta obter a lista do cache
             {
                 funcionarios = await _context.Funcionarios.Include("Alocacoes").ToListAsync();
-                _cache.Set(CacheKeys.ListaFuncionarios, funcionarios);
+                _cache.Set(CacheKeys.ListaFuncionarios, funcionarios);  // Armazena a lista no cache para futuras requisições
             }
             return funcionarios;
         }
@@ -34,17 +34,17 @@ namespace ADOSMELHORES.Controllers
             string dataCookie = Request.Cookies["DataSistema"];
             DateTime dataAtualDoSistema;
 
-            if (string.IsNullOrEmpty(dataCookie) || !DateTime.TryParse(dataCookie, out dataAtualDoSistema))
+            if (string.IsNullOrEmpty(dataCookie) || !DateTime.TryParse(dataCookie, out dataAtualDoSistema))  // Se o cookie não existir ou for inválido, define a data atual do sistema
             {
                 dataAtualDoSistema = DateTime.Today;
 
                 CookieOptions options = new CookieOptions
                 {
-                    Expires = DateTime.Now.AddMinutes(30),
+                    Expires = DateTime.Now.AddMinutes(30),  // Define o tempo de expiração do cookie para 30 minutos
                     HttpOnly = true
                 };
 
-                Response.Cookies.Append("DataSistema", dataAtualDoSistema.ToString("yyyy-MM-dd"), options);
+                Response.Cookies.Append("DataSistema", dataAtualDoSistema.ToString("yyyy-MM-dd"), options);  // Armazena a data atual do sistema no cookie para futuras requisições
             }
             return dataAtualDoSistema;
         }
@@ -54,7 +54,7 @@ namespace ADOSMELHORES.Controllers
         {
             var funcionarios = await _context.Funcionarios.ToListAsync();
 
-            DateTime dataAtualSistema = ObterDataDoSistema();
+            DateTime dataAtualSistema = ObterDataDoSistema();  // Obtém a data atual do sistema, considerando o cookie "DataSistema"
 
             if (!funcionarios.Any())
             {
@@ -63,14 +63,12 @@ namespace ADOSMELHORES.Controllers
 
             var csv = new StringBuilder();
 
-            // Cabeçalho do CSV
             csv.AppendLine("Id,Nome,Morada,Contacto,Tipo,DataFimContrato,DataRegistoCriminal,Salario,Area,AreaLecionada,ValorHora,IsencaoHorario,BonusMensal,CarroEmpresa,TipoDisponibilidade,DiretorId,CoordenadorId");
 
-            // Linhas de dados
-            foreach (var funcionario in funcionarios)
+            foreach (var funcionario in funcionarios)  
             {
                 var tipo = funcionario.GetType().Name;
-                var salario = "null";
+                var salario = "null";  // Inicializa as variáveis com "null" para os campos que podem não ser aplicáveis a todos os tipos de funcionários, garantindo que o CSV tenha uma estrutura consistente mesmo quando algumas informações não estiverem disponíveis
                 var area = "null";
                 var areaLecionada = "null";
                 var valorHora = "null";
@@ -83,14 +81,14 @@ namespace ADOSMELHORES.Controllers
 
                 if (funcionario is Diretor d)
                 {
-                    salario = d.Salario.ToString("F2");
+                    salario = d.Salario.ToString("F2");  // Formata o salário com duas casas decimais para melhor legibilidade no CSV
                     isencaoHorario = d.IsencaoHorario.ToString();
                     bonusMensal = d.BonusMensal.HasValue ? d.BonusMensal.Value.ToString("F2") : "null";
                     carroEmpresa = d.CarroEmpresa.ToString();
                 }
                 else if (funcionario is Secretaria s)
                 {
-                    salario = s.Salario.ToString("F2");
+                    salario = s.Salario.ToString("F2"); 
                     area = s.Area;
                     diretorId = s.DiretorId.ToString() ?? "null";
                 }
@@ -106,7 +104,7 @@ namespace ADOSMELHORES.Controllers
                     salario = c.Salario.ToString("F2");
                 }
 
-                var linha = $"\"{funcionario.Id}\",\"{funcionario.Nome}\",\"{funcionario.Morada}\"," +
+                var linha = $"\"{funcionario.Id}\",\"{funcionario.Nome}\",\"{funcionario.Morada}\"," + 
                     $"\"{funcionario.Contacto}\",\"{tipo}\",\"{funcionario.DataFimContrato:yyyy-MM-dd}\"," +
                     $"\"{funcionario.DataRegistoCriminal:yyyy-MM-dd}\",\"{salario}\",\"{area}\"," +
                     $"\"{areaLecionada}\",\"{valorHora}\",\"{isencaoHorario}\",\"{bonusMensal}\"," +
@@ -115,8 +113,8 @@ namespace ADOSMELHORES.Controllers
                 csv.AppendLine(linha);
             }
 
-            var conteudo = Encoding.UTF8.GetBytes(csv.ToString());
-            return File(conteudo, "text/csv", $"Funcionarios_{dataAtualSistema:yyyyMMdd}.csv");
+            var conteudo = Encoding.UTF8.GetBytes(csv.ToString());  
+            return File(conteudo, "text/csv", $"Funcionarios_{dataAtualSistema:yyyyMMdd}.csv");  // Retorna o arquivo CSV para download, utilizando a data atual do sistema no nome do arquivo para facilitar a identificação da data de exportação dos dados
         }
     }
 }

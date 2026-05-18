@@ -10,13 +10,13 @@ namespace ADOSMELHORES.Controllers
     public class AlocacaoController : BaseController
     {
         public AlocacaoController(EmpresaContext context, IMemoryCache cache) : base(context, cache) { }
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index() 
         {
             var funcionarios = await ObterFuncionariosDaCache();
 
-            var alocacoes = funcionarios
+            var alocacoes = funcionarios  // Obter as alocações diretamente dos formadores
                 .OfType<Formador>()
-                .Where(f => f.Alocacoes != null)
+                .Where(f => f.Alocacoes != null)  
                 .SelectMany(f => f.Alocacoes)
                 .ToList();
 
@@ -25,16 +25,16 @@ namespace ADOSMELHORES.Controllers
         }
 
         [HttpPost, ActionName("Delete")]
-        public async Task<IActionResult> DeleteConfirmed(Guid id)
+        public async Task<IActionResult> DeleteConfirmed(Guid id)  
         {
             var alocacao = await _context.Alocacoes.FindAsync(id);
 
-            if (alocacao == null)
+            if (alocacao == null)  // Verificar se a alocação existe antes de tentar eliminar
             {
                 return Json(new { sucesso = false, mensagem = "Formação não encontrada na base de dados." });
             }
 
-            try
+            try  // Tentar eliminar a alocação e atualizar a cache, tratando possíveis erros de forma adequada
             {
                 var funcionarios = await ObterFuncionariosDaCache();
                 var existeNaCache = funcionarios
