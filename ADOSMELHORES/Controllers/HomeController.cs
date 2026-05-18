@@ -23,17 +23,17 @@ namespace ADOSMELHORES.Controllers
 
             var model = new HomeIndexViewModel();
 
-            decimal TotalDiretores = funcionarios.OfType<Diretor>().Sum(d => d.Salario + (d.BonusMensal ?? 0));
+            decimal TotalDiretores = funcionarios.OfType<Diretor>().Where(d => d.DataFimContrato >= dataAtualDoSistema).Sum(d => d.Salario + (d.BonusMensal ?? 0));
             model.TotalDiretores = TotalDiretores;
-            decimal TotalSecretarias = funcionarios.OfType<Secretaria>().Sum(s => s.Salario);
+            decimal TotalSecretarias = funcionarios.OfType<Secretaria>().Where(d => d.DataFimContrato >= dataAtualDoSistema).Sum(s => s.Salario);
             model.TotalSecretarias = TotalSecretarias;
-            decimal TotalCoordenadores = funcionarios.OfType<Coordenador>().Sum(c => c.Salario);
+            decimal TotalCoordenadores = funcionarios.OfType<Coordenador>().Where(d => d.DataFimContrato >= dataAtualDoSistema).Sum(c => c.Salario);
             model.TotalCoordenadores = TotalCoordenadores;
 
             DateTime inicioDoMes = new DateTime(dataAtualDoSistema.Year, dataAtualDoSistema.Month, 1);
             DateTime fimDoMes = inicioDoMes.AddMonths(1).AddDays(-1);
 
-            decimal TotalFormadores = funcionarios.OfType<Formador>().Sum(f => f.Alocacoes?
+            decimal TotalFormadores = funcionarios.OfType<Formador>().Where(f => f.DataFimContrato >= dataAtualDoSistema).Sum(f => f.Alocacoes?
                 .Where(a => a.DataInicio <= fimDoMes && a.DataFim >= inicioDoMes)
                 .Sum(a => {
                     DateTime dataCalculoInicio = a.DataInicio < inicioDoMes ? inicioDoMes : a.DataInicio;
@@ -45,7 +45,7 @@ namespace ADOSMELHORES.Controllers
 
             model.TotalGeral = TotalDiretores + TotalSecretarias + TotalCoordenadores + TotalFormadores;
 
-            model.QtdFuncionarios = funcionarios.Count();
+            model.QtdFuncionarios = funcionarios.Count(f => f.DataFimContrato >= dataAtualDoSistema);
 
             model.QtdFuncionariosContratos = funcionarios.Count(f =>
                 f.DataFimContrato >= dataAtualDoSistema &&

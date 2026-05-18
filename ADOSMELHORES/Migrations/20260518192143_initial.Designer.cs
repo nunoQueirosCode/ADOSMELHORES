@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ADOSMELHORES.Migrations
 {
     [DbContext(typeof(EmpresaContext))]
-    [Migration("20260518185614_initial")]
+    [Migration("20260518192143_initial")]
     partial class initial
     {
         /// <inheritdoc />

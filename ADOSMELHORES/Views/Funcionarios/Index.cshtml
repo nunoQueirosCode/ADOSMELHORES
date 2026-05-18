@@ -95,6 +95,12 @@
                                                     <span class="badge bg-danger bg-opacity-10 text-danger border border-danger">Registo Criminal</span>
                                                 </div>
                                             }
+                                            @if (funcionario.DataFimContrato < dataReferencia)
+                                            {
+                                                <div class="text-muted small">
+                                                    <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary">Contrato Expirado</span>
+                                                </div>
+                                            }
                                         </div>
                                     </div>
                                 </div>

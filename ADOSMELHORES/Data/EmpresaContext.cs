@@ -75,7 +75,7 @@ namespace ADOSMELHORES.Data
                 Nome = "Mário Oliveira",
                 Contacto = "912345678",
                 DataFimContrato = new DateTime(2028, 12, 31),
-                DataRegistoCriminal = new DateTime(2023, 5, 10),
+                DataRegistoCriminal = new DateTime(2026, 5, 10),
                 IsencaoHorario = true,
                 Salario = 3500.00m,
                 CarroEmpresa = true
@@ -87,7 +87,7 @@ namespace ADOSMELHORES.Data
                 Nome = "Nuno Queirós",
                 Contacto = "962345678",
                 DataFimContrato = new DateTime(2026, 6, 1),
-                DataRegistoCriminal = new DateTime(2023, 6, 15),
+                DataRegistoCriminal = new DateTime(2026, 4, 15),
                 Salario = 2200.00m
             });
 

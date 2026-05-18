@@ -46,16 +46,6 @@ namespace ADOSMELHORES.Migrations
                     b.HasIndex("FormadorId");
 
                     b.ToTable("Alocacoes");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("55555555-5555-5555-5555-555555555555"),
-                            DataFim = new DateTime(2026, 5, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            DataInicio = new DateTime(2026, 5, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            DescricaoFormacao = "Curso Intensivo de ASP.NET MVC",
-                            FormadorId = new Guid("44444444-4444-4444-4444-444444444444")
-                        });
                 });
 
             modelBuilder.Entity("ADOSMELHORES.Data.Empresa.Funcionario", b =>
@@ -109,18 +99,6 @@ namespace ADOSMELHORES.Migrations
                         });
 
                     b.HasDiscriminator().HasValue("Coordenador");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("22222222-2222-2222-2222-222222222222"),
-                            Contacto = "962345678",
-                            DataFimContrato = new DateTime(2026, 6, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            DataRegistoCriminal = new DateTime(2023, 6, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Morada = "",
-                            Nome = "Nuno Queirós",
-                            Salario = 2200.00m
-                        });
                 });
 
             modelBuilder.Entity("ADOSMELHORES.Data.Empresa.Diretor", b =>
@@ -140,20 +118,6 @@ namespace ADOSMELHORES.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.HasDiscriminator().HasValue("Diretor");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("11111111-1111-1111-1111-111111111111"),
-                            Contacto = "912345678",
-                            DataFimContrato = new DateTime(2028, 12, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            DataRegistoCriminal = new DateTime(2023, 5, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Morada = "",
-                            Nome = "Mário Oliveira",
-                            CarroEmpresa = true,
-                            IsencaoHorario = true,
-                            Salario = 3500.00m
-                        });
                 });
 
             modelBuilder.Entity("ADOSMELHORES.Data.Empresa.Formador", b =>
@@ -175,21 +139,6 @@ namespace ADOSMELHORES.Migrations
                     b.HasIndex("CoordenadorId");
 
                     b.HasDiscriminator().HasValue("Formador");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("44444444-4444-4444-4444-444444444444"),
-                            Contacto = "919876543",
-                            DataFimContrato = new DateTime(2026, 12, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            DataRegistoCriminal = new DateTime(2026, 9, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Morada = "",
-                            Nome = "Jorge Dias",
-                            AreaLecionada = "Programação C#",
-                            CoordenadorId = new Guid("22222222-2222-2222-2222-222222222222"),
-                            TipoDisponibilidade = 2,
-                            ValorHora = 25.50m
-                        });
                 });
 
             modelBuilder.Entity("ADOSMELHORES.Data.Empresa.Secretaria", b =>
@@ -214,20 +163,6 @@ namespace ADOSMELHORES.Migrations
                         });
 
                     b.HasDiscriminator().HasValue("Secretaria");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("33333333-3333-3333-3333-333333333333"),
-                            Contacto = "932345678",
-                            DataFimContrato = new DateTime(2026, 12, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            DataRegistoCriminal = new DateTime(2026, 8, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Morada = "",
-                            Nome = "Bruna Buss",
-                            Area = "Recursos Humanos",
-                            DiretorId = new Guid("11111111-1111-1111-1111-111111111111"),
-                            Salario = 1100.00m
-                        });
                 });
 
             modelBuilder.Entity("ADOSMELHORES.Data.Empresa.Alocacao", b =>
