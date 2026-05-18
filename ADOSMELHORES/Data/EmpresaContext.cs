@@ -62,7 +62,7 @@ namespace ADOSMELHORES.Data
 
             // DATA SEEDING
 
-            // Guids fixos para podermos usar nas chaves estrangeiras
+            //// Guids fixos para podermos usar nas chaves estrangeiras
             var diretorId = Guid.Parse("11111111-1111-1111-1111-111111111111");
             var coordenadorId = Guid.Parse("22222222-2222-2222-2222-222222222222");
             var secretariaId = Guid.Parse("33333333-3333-3333-3333-333333333333");
