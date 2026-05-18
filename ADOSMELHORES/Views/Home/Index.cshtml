@@ -178,7 +178,6 @@
                 `Diretores (@Model.QtdDiretores)`
                 ],
                 datasets: [{
-                    // Usamos InvariantCulture para garantir que o decimal vem com ponto (.) e não vírgula (,)
                     data: [
                         @Model.TotalFormadores.ToString(System.Globalization.CultureInfo.InvariantCulture), 
                         @Model.TotalSecretarias.ToString(System.Globalization.CultureInfo.InvariantCulture), 
@@ -187,7 +186,7 @@
                     ],
                     backgroundColor: ['#06B6D4', '#F59E0B', '#1A365D', '#5287C5'],
                     borderWidth: 0,
-                    hoverOffset: 15 // Aumentei um pouco para dar destaque ao passar o rato
+                    hoverOffset: 15 
                 }]
             };
 
@@ -207,18 +206,15 @@
                             labels: {
                                 usePointStyle: true,
                                 padding: 20,
-                                // Formata a legenda para mostrar o nome e o valor
                                 font: { size: 13 }
                             }
                         },
-                        // ADICIONAR ISTO: Formata o popup que aparece ao passar o rato
                         tooltip: {
                             callbacks: {
                                 label: function(context) {
                                     let label = context.label || '';
                                     if (label) { label += ': '; }
                                     if (context.parsed !== null) {
-                                        // Formata como moeda: 1250.5 -> 1.250,50 €
                                         label += new Intl.NumberFormat('pt-PT', { style: 'currency', currency: 'EUR' }).format(context.parsed);
                                     }
                                     return label;

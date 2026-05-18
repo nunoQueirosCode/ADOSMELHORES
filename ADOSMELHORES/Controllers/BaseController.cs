@@ -8,6 +8,7 @@ using System.Text;
 
 namespace ADOSMELHORES.Controllers
 {
+   
     public abstract class BaseController : Controller
     {
         protected readonly EmpresaContext _context;
@@ -19,6 +20,7 @@ namespace ADOSMELHORES.Controllers
             _cache = cache;
         }
 
+        // Método para obter a lista de funcionários da cache, se não estiver presente, procura na base de dados e armazena na cache
         protected async Task<List<Funcionario>> ObterFuncionariosDaCache()
         {
             if (!_cache.TryGetValue(CacheKeys.ListaFuncionarios, out List<Funcionario> funcionarios))
@@ -29,6 +31,7 @@ namespace ADOSMELHORES.Controllers
             return funcionarios;
         }
 
+        // Método para obter a data atual do sistema, usando cookies para persistir a data durante a sessão
         protected DateTime ObterDataDoSistema()
         {
             string dataCookie = Request.Cookies["DataSistema"];
@@ -41,7 +44,7 @@ namespace ADOSMELHORES.Controllers
                 CookieOptions options = new CookieOptions
                 {
                     Expires = DateTime.Now.AddMinutes(30),
-                    HttpOnly = true
+                    HttpOnly = true // Impede acesso via JavaScript
                 };
 
                 Response.Cookies.Append("DataSistema", dataAtualDoSistema.ToString("yyyy-MM-dd"), options);
@@ -49,6 +52,8 @@ namespace ADOSMELHORES.Controllers
             return dataAtualDoSistema;
         }
 
+
+        // Cria um endpoint para exportar os funcionários em formato CSV
         [HttpGet]
         public async Task<IActionResult> ExportarCSV()
         {
@@ -63,10 +68,8 @@ namespace ADOSMELHORES.Controllers
 
             var csv = new StringBuilder();
 
-            // Cabeçalho do CSV
             csv.AppendLine("Id,Nome,Morada,Contacto,Tipo,DataFimContrato,DataRegistoCriminal,Salario,Area,AreaLecionada,ValorHora,IsencaoHorario,BonusMensal,CarroEmpresa,TipoDisponibilidade,DiretorId,CoordenadorId");
 
-            // Linhas de dados
             foreach (var funcionario in funcionarios)
             {
                 var tipo = funcionario.GetType().Name;

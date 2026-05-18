@@ -68,7 +68,7 @@ namespace ADOSMELHORES.Controllers
         {
             if (ModelState.IsValid)
             {
-                Funcionario novoFuncionario = null;
+                Funcionario novoFuncionario = null; // Variável para armazenar o novo funcionário a ser criado
 
                 switch (model.TipoFuncionario)
                 {
@@ -125,6 +125,7 @@ namespace ADOSMELHORES.Controllers
               
             }
 
+            // Se o modelo não for válido, recarregar as listas de diretores e coordenadores para o dropdown
             var funcionarios = await ObterFuncionariosDaCache();
 
             DateTime dataAtualSistema = ObterDataDoSistema();
@@ -141,6 +142,7 @@ namespace ADOSMELHORES.Controllers
 
             return View(model);
         }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -306,16 +308,16 @@ namespace ADOSMELHORES.Controllers
 
                     _cache.Remove(CacheKeys.ListaFuncionarios);
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (DbUpdateConcurrencyException) 
                 {
                     if (!funcionarios.Any(e => e.Id == id))
                         return RedirectToAction(nameof(Index));
-                    else
-                        throw;
                 }
 
                 return RedirectToAction(nameof(Details), new { id = funcionarioExistente.Id });
             }
+
+            // Se o modelo não for válido, recarregar as listas de diretores e coordenadores para o dropdown
             var listaFuncionarios = await ObterFuncionariosDaCache();
 
             DateTime dataAtualSistema = ObterDataDoSistema();
@@ -342,7 +344,7 @@ namespace ADOSMELHORES.Controllers
                     var secretariasAfetadas = funcionarios.OfType<Secretaria>().Where(s => s.DiretorId == id);
                     foreach (var sec in secretariasAfetadas)
                     {
-                        sec.DiretorId = null;
+                        sec.DiretorId = null; // Desassociar a secretária do diretor que está a ser removido
                     }
                 }
                 if (funcionario is Coordenador)
@@ -350,7 +352,7 @@ namespace ADOSMELHORES.Controllers
                     var formadoresAfetados = funcionarios.OfType<Formador>().Where(f => f.CoordenadorId == id);
                     foreach (var form in formadoresAfetados)
                     {
-                        form.CoordenadorId = null;
+                        form.CoordenadorId = null; // Desassociar o formador do coordenador que está a ser removido
                     }
                 }
                 _context.Funcionarios.Remove(funcionario);
@@ -399,6 +401,7 @@ namespace ADOSMELHORES.Controllers
             return Json(new { sucesso = true });
         }
 
+
         [HttpPost]
         public async Task<IActionResult> CalcularVencimento(Guid? id, DateTime dataInicio, DateTime dataFim)
         {
@@ -417,7 +420,15 @@ namespace ADOSMELHORES.Controllers
 
             decimal valorHora = formador.ValorHora;
 
-            int totalDias = (dataFim - dataInicio).Days + 1;
+            
+            int totalDias = 0;
+            for (var data = dataInicio; data <= dataFim; data = data.AddDays(1))
+            {
+                if (data.DayOfWeek != DayOfWeek.Saturday && data.DayOfWeek != DayOfWeek.Sunday)
+                {
+                    totalDias++;
+                }
+            }
             int horasPorDia = 6;
 
             decimal valorTotal = totalDias * horasPorDia * valorHora;
@@ -430,6 +441,7 @@ namespace ADOSMELHORES.Controllers
             });
         }
 
+        // Endpoint para remover a associação entre um formador e um coordenador
         [HttpPost]
         public async Task<IActionResult> RemoverAssociacao(Guid? formadorId, Guid? coordenadorId)
         {

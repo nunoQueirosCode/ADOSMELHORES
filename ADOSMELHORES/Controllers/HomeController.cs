@@ -23,6 +23,7 @@ namespace ADOSMELHORES.Controllers
 
             var model = new HomeIndexViewModel();
 
+            // Cálculo dos totais de despesas por tipo de funcionário
             decimal TotalDiretores = funcionarios.OfType<Diretor>().Where(d => d.DataFimContrato >= dataAtualDoSistema).Sum(d => d.Salario + (d.BonusMensal ?? 0));
             model.TotalDiretores = TotalDiretores;
             decimal TotalSecretarias = funcionarios.OfType<Secretaria>().Where(d => d.DataFimContrato >= dataAtualDoSistema).Sum(s => s.Salario);
@@ -45,6 +46,8 @@ namespace ADOSMELHORES.Controllers
 
             model.TotalGeral = TotalDiretores + TotalSecretarias + TotalCoordenadores + TotalFormadores;
 
+
+            // Cálculo de Número de funcionários ativos, contratos a vencer, registos criminais e por tipo de funcionário
             model.QtdFuncionarios = funcionarios.Count(f => f.DataFimContrato >= dataAtualDoSistema);
 
             model.QtdFuncionariosContratos = funcionarios.Count(f =>
@@ -53,11 +56,12 @@ namespace ADOSMELHORES.Controllers
 
             model.QtdFuncionariosRegistoCriminal = funcionarios.Count(f => f.DataRegistoCriminal < dataAtualDoSistema && f.DataFimContrato >= dataAtualDoSistema);
 
-            model.QtdDiretores = funcionarios.OfType<Diretor>().Count();
-            model.QtdCoordenadores = funcionarios.OfType<Coordenador>().Count();
-            model.QtdSecretarias = funcionarios.OfType<Secretaria>().Count();
-            model.QtdFormadores = funcionarios.OfType<Formador>().Count();
+            model.QtdDiretores = funcionarios.OfType<Diretor>().Count(f => f.DataFimContrato >= dataAtualDoSistema);
+            model.QtdCoordenadores = funcionarios.OfType<Coordenador>().Count(f => f.DataFimContrato >= dataAtualDoSistema);
+            model.QtdSecretarias = funcionarios.OfType<Secretaria>().Count(f => f.DataFimContrato >= dataAtualDoSistema);
+            model.QtdFormadores = funcionarios.OfType<Formador>().Count(f => f.DataFimContrato >= dataAtualDoSistema);
 
+            // lista de formações alocadas a decorrer
             model.TabelaAlocacoes = funcionarios.OfType<Formador>()
                     .SelectMany(f => f.Alocacoes, (f, a) => new { Funcionario = f, Alocacao = a })
                     .Where(x => x.Alocacao.DataInicio <= dataAtualDoSistema && x.Alocacao.DataFim >= dataAtualDoSistema)
@@ -67,7 +71,7 @@ namespace ADOSMELHORES.Controllers
                     {
                         AlocacaoId = x.Alocacao.Id,
                         Descricao = x.Alocacao.DescricaoFormacao,
-                        NomeFuncionario = x.Funcionario.Nome, // Pegamos no nome do funcionário
+                        NomeFuncionario = x.Funcionario.Nome, 
                         DataInicio = x.Alocacao.DataInicio,
                         DataFim = x.Alocacao.DataFim
                     })
@@ -97,35 +101,7 @@ namespace ADOSMELHORES.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        //public async Task<IActionResult> CalcularDespesaMensal()
-        //{
-   
-        //    DateTime dataAtualDoSistema = ObterDataDoSistema();
-
-        //    var funcionarios = await ObterFuncionariosDaCache();
-
-        //    var model = new HomeDashboardViewModel();
-
-        //    model.TotalDiretores = funcionarios.OfType<Diretor>().Sum(d => d.Salario + (d.BonusMensal ?? 0));
-        //    model.TotalSecretarias = funcionarios.OfType<Secretaria>().Sum(s => s.Salario);
-        //    model.TotalCoordenadores = funcionarios.OfType<Coordenador>().Sum(c => c.Salario);
-
-        //    DateTime inicioDoMes = new DateTime(dataAtualDoSistema.Year, dataAtualDoSistema.Month, 1);
-        //    DateTime fimDoMes = inicioDoMes.AddMonths(1).AddDays(-1);
-
-        //    model.TotalFormadores = funcionarios.OfType<Formador>().Sum(f => f.Alocacoes?
-        //        .Where(a => a.DataInicio <= fimDoMes && a.DataFim >= inicioDoMes)
-        //        .Sum(a => {DateTime dataCalculoInicio = a.DataInicio < inicioDoMes ? inicioDoMes : a.DataInicio;
-        //                   DateTime dataCalculoFim = a.DataFim > fimDoMes ? fimDoMes : a.DataFim;
-        //                   return ContarDiasUteis(dataCalculoInicio, dataCalculoFim) * 6 * f.ValorHora;
-        //                   }) ?? 0);
-
-        //    model.TotalGeral = model.TotalDiretores + model.TotalSecretarias + model.TotalCoordenadores + model.TotalFormadores;
-
-        //    model.QtdFuncionarios = funcionarios.Count;
-
-        //    return View(model);
-        //}
+        
 
         private int ContarDiasUteis(DateTime inicio, DateTime fim)
         {

@@ -9,7 +9,7 @@
         <h2 style="color: var(--azul-conhecimento); font-weight: 700; margin-bottom: 0;">Editar Funcionário</h2>
         <span class="text-muted">Atualize os dados e os detalhes específicos do cargo</span>
     </div>
-    <a asp-action="Index" class="btn btn-light border">
+    <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-light border">
         <i class="fa-solid fa-arrow-left me-2"></i>Voltar
     </a>
 </div>
@@ -167,18 +167,13 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
-            // Obter o valor do tipo de funcionário a partir do campo escondido
             var tipo = $('#TipoFuncionarioHidden').val();
 
-            // Esconder todas as secções por precaução
             $('.secao-especifica').addClass('d-none');
 
-            // Se existir um tipo válido
             if (tipo) {
-                // Mostrar a secção correta
                 $('#Secao' + tipo).removeClass('d-none');
                 
-                // Aplicar a lógica do Salário Base (se for Formador, fica desativado)
                 if (tipo === "Formador") {
                     $('#SalarioBase').attr("disabled", true);
                 } else {

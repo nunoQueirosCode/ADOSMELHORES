@@ -35,7 +35,6 @@
         return (primeiraLetra + ultimaLetra).ToUpper();
     }
 }
-<!-- Cabeçalho com Botão de Voltar -->
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
         <h2 style="color: var(--azul-conhecimento); font-weight: 700; margin-bottom: 0;">Detalhes do Funcionário</h2>
@@ -55,7 +54,6 @@
             <h5 class="alert-heading mb-1 fw-bold">Atenção: Registo Criminal a Expirar!</h5>
             <p class="mb-0">O registo criminal deste funcionário expira em breve (ou já expirou). É necessário atualizar este documento legal para manter as funções ativas.</p>
         </div>
-        <!-- Botão que abre o Modal -->
         <button type="button" class="btn btn-warning fw-bold ms-3" data-bs-toggle="modal" data-bs-target="#modalRegistoCriminal">
             <i class="fa-solid fa-calendar-check me-2"></i>Atualizar Data
         </button>
@@ -71,20 +69,19 @@
             <h5 class="alert-heading mb-1 fw-bold">Atenção: Contrato a Expirar!</h5>
             <p class="mb-0">O contrato deste funcionário expira em breve. É necessário atualizar este documento legal para manter as funções ativas.</p>
         </div>
-        <!-- Botão que abre o Modal -->
         <button type="button" class="btn btn-warning fw-bold ms-3" data-bs-toggle="modal" data-bs-target="#modalContrato">
             <i class="fa-solid fa-calendar-check me-2"></i>Atualizar Data
         </button>
     </div>
 }
-<!-- DETALHES DO FUNCIONÁRIO (Layout em 2 Colunas) -->
+
+<!-- DETALHES DO FUNCIONÁRIO -->
 <div class="row">
-    <!-- Coluna Esquerda: Info Principal -->
     <div class="col-md-4 mb-4">
         <div class="card card-ados h-100">
             <div class="card-body text-center p-4">
                 <div class="bg-light rounded-circle d-flex justify-content-center align-items-center mx-auto mb-3" style="width: 100px; height: 100px; color: var(--azul-conhecimento); font-size: 2rem;">
-                    <!-- Podes pôr as iniciais dinâmicas aqui ou a foto de perfil -->
+                   
                     <strong>@ObterIniciais(Model.Nome)</strong>
                 </div>
                 <h4 class="fw-bold" style="color: var(--azul-conhecimento);">@Model.Nome</h4>
@@ -107,12 +104,10 @@
     </div>
 
 
-    <!-- Coluna Direita: Mais Detalhes e Ações -->
     <div class="col-md-8 mb-4">
         <div class="card card-ados h-100">
             <div class="card-header card-ados-header d-flex justify-content-between align-items-center">
                 <span><i class="fa-solid fa-circle-info me-2"></i>Informação Detalhada</span>
-                <!-- Botões de Ação Principais -->
                 <div>
                     @if (Model.GetType().Name == "Formador")
                     {
@@ -608,7 +603,6 @@
             
                 var linhaParaRemover = null;
 
-                // 1. Quando o modal abre, preenchemos os dados E guardamos a linha
                 $('#modalRemoverFormador').on('show.bs.modal', function (event) {
                 
                     var button = event.relatedTarget;
@@ -623,9 +617,8 @@
                     linhaParaRemover = $(button).closest('tr');
                 });
 
-                // 2. Quando o utilizador clica em "Sim, Remover"
                 $('#formRemoverFormador').submit(function (e) {
-                    e.preventDefault(); // Impede o refresh da página
+                    e.preventDefault(); 
 
                     var formadorId = $('#formadorIdModal').val();
                     var coordenadorId = $('#coordenadorIdModal').val();
@@ -634,7 +627,7 @@
                     var textoOriginal = btnSubmit.html();
                     btnSubmit.html('<i class="fa-solid fa-spinner fa-spin me-2"></i>A remover...').prop('disabled', true);
 
-                    // 3. Fazer o pedido AJAX
+                    
                     $.ajax({
                         url: '/Funcionarios/RemoverAssociacao',
                         type: 'POST',
@@ -682,22 +675,20 @@
             $(document).ready(function () {
             
                 $('#formCalcularVencimento').submit(function (e) {
-                    e.preventDefault(); // Impede que a página faça refresh
+                    e.preventDefault(); 
 
-                    // 1. Obter os valores do modal
                     var idFormador = $('#calcFormadorId').val();
                     var dataInicio = $('#calcDataInicio').val();
                     var dataFim = $('#calcDataFim').val();
                     
                     var divErro = $('#erroVencimento');
-                    // 2. Colocar o botão em estado de "A carregar..." para dar feedback ao utilizador
                     var btn = $('#btnCalcular');
                     var textoOriginal = btn.html();
                     btn.html('<i class="fa-solid fa-spinner fa-spin me-2"></i>A calcular...').prop('disabled', true);
 
-                    // 3. Fazer o pedido AJAX ao Controlador
+                    
                     $.ajax({
-                        url: '/Funcionarios/CalcularVencimento', // O nome do teu método no C#
+                        url: '/Funcionarios/CalcularVencimento', 
                         type: 'POST',
                         data: {
                             id: idFormador,
@@ -707,11 +698,9 @@
                         success: function (response) {
                             if (response.sucesso) {
                                 divErro.text(response.mensagem).addClass('d-none');
-                                // Se correu bem, injetamos os dados no HTML e mostramos a div
                                 $('#valorFinalDisplay').text(response.valorTotalFormatado);
                                 $('#detalhesCalculoDisplay').text(response.detalhesCalculo);
                                 
-                                // Animação suave para mostrar o resultado
                                 $('#resultadoCalculo').removeClass('d-none').hide().fadeIn();
                             } else {
                                 divErro.text(response.mensagem).removeClass('d-none');
@@ -721,13 +710,11 @@
                             alert('Ocorreu um erro de comunicação com o servidor.');
                         },
                         complete: function() {
-                            // Independentemente de dar erro ou sucesso, restauramos o botão ao normal
                             btn.html(textoOriginal).prop('disabled', false);
                         }
                     });
                 });
 
-                // Truque de UI: Limpar o modal sempre que ele é fechado, para estar limpo na próxima vez
                 $('#modalCalcularVencimento').on('hidden.bs.modal', function () {
                     $('#resultadoCalculo').addClass('d-none');
                     $('#formCalcularVencimento')[0].reset();
@@ -759,7 +746,6 @@
                         }
                     },
                     error: function () {
-                        // ERRO DE REDE/SERVIDOR
                         divErro.text('Ocorreu um erro de comunicação com o servidor.').removeClass('d-none');
                         btnSubmit.html(textoOriginal).prop('disabled', false);
                     }

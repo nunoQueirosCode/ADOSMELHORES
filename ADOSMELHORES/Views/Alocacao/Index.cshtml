@@ -3,7 +3,7 @@
     ViewData["Title"] = "Alocações";
 }
 
-@Html.AntiForgeryToken()
+@Html.AntiForgeryToken() 
 
 @section Styles {
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
@@ -59,7 +59,7 @@
     </div>
 </div>
 
-<!--Modal para confrimar remoção de formador da equipa-->
+<!--Modal para confrimar remoção de formações-->
 <div class="modal fade" id="modalRemoverAlocacao" tabindex="-1" aria-labelledby="modalRemoverLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg">
@@ -116,7 +116,6 @@
             
                 var linhaParaRemover = null;
 
-                // 1. Quando o modal abre, preenchemos os dados E guardamos a linha
                 $('#modalRemoverAlocacao').on('show.bs.modal', function (event) {
                 
                     var button = event.relatedTarget;
@@ -131,9 +130,8 @@
                     linhaParaRemover = $(button).closest('tr');
                 });
 
-                // 2. Quando o utilizador clica em "Sim, Remover"
                 $('#formRemoverAlocaocao').submit(function (e) {
-                    e.preventDefault(); // Impede o refresh da página
+                    e.preventDefault(); 
 
                     var alocacaoId = $('#alocacaoIdModal').val();
                 
@@ -141,7 +139,6 @@
                     var textoOriginal = btnSubmit.html();
                     btnSubmit.html('<i class="fa-solid fa-spinner fa-spin me-2"></i>A remover...').prop('disabled', true);
 
-                    // 3. Fazer o pedido AJAX
                     $.ajax({
                         url: '/Alocacao/Delete', 
                         type: 'POST',

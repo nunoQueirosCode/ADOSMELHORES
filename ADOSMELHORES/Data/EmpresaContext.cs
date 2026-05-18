@@ -11,7 +11,6 @@ namespace ADOSMELHORES.Data
 
         }
 
-        // Esses DbSets são as tabelas no contexto da base de dados
         public DbSet<Funcionario> Funcionarios { get; set; }
         public DbSet<Diretor> Diretores { get; set; }
         public DbSet<Secretaria> Secretarias { get; set; }
